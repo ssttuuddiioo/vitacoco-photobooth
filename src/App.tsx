@@ -18,7 +18,6 @@ export const App = () => {
   const [screen, setScreen] = useState<Screen>('welcome');
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [photoStrip, setPhotoStrip] = useState<PhotoStrip | null>(null);
-  const [didPrint, setDidPrint] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -66,7 +65,6 @@ export const App = () => {
     // Reset state
     setPhotos([]);
     setPhotoStrip(null);
-    setDidPrint(false);
     setHasProcessed(false); // Reset processing flag
     setScreen('welcome');
 
@@ -133,7 +131,6 @@ export const App = () => {
   };
 
   const handlePrint = () => {
-    setDidPrint(true);
     setScreen('thanks');
   };
 
@@ -226,7 +223,6 @@ export const App = () => {
               {screen === 'thanks' && (
                 <ThankYouScreen
                   onComplete={handleThankYouComplete}
-                  didPrint={didPrint}
                 />
               )}
             </div>

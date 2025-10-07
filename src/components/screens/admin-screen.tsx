@@ -14,7 +14,6 @@ import {
   saveAppSettings,
   type AppSettings,
 } from '@/lib/app-settings';
-import { selectFolder } from '@/lib/electron-api';
 
 interface AdminScreenProps {
   onExit: () => void;
