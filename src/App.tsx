@@ -1,6 +1,5 @@
 // Main App component with state machine for photo booth flow
 import { useEffect, useState } from 'react';
-import { useFullscreen } from '@/hooks/use-fullscreen';
 import { useWakeLock } from '@/hooks/use-wake-lock';
 import { useIdleReset } from '@/hooks/use-idle-reset';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -68,7 +67,6 @@ export const App = () => {
     setPhotos([]);
     setPhotoStrip(null);
     setDidPrint(false);
-    setIsCameraActive(false); // Stop camera on reset
     setHasProcessed(false); // Reset processing flag
     setScreen('welcome');
 
@@ -85,8 +83,7 @@ export const App = () => {
 
   // Screen navigation handlers
   const startSession = () => {
-    // Initialize camera when session starts (already active from welcome)
-    setIsCameraActive(true);
+    // Camera is already active from welcome screen
     setScreen('capture'); // Go directly to capture (countdown is integrated)
   };
 

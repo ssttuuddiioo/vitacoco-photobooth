@@ -28,8 +28,8 @@ export const CaptureCountdownScreen = ({
 
   // Main synchronized photo capture sequence
   useEffect(() => {
-    if (!videoRef.current || !cameraStream) return;
-    if (currentPhotoIndex >= CONSTANTS.PHOTO_COUNT) return;
+    if (!videoRef.current || !cameraStream) return undefined;
+    if (currentPhotoIndex >= CONSTANTS.PHOTO_COUNT) return undefined;
 
     // Countdown phase
     if (countdown > 0) {
@@ -60,6 +60,8 @@ export const CaptureCountdownScreen = ({
 
       return () => clearTimeout(captureTimer);
     }
+
+    return undefined;
   }, [countdown, currentPhotoIndex, videoRef, cameraStream, capturePhoto]);
 
   // Navigate to review when all photos captured
