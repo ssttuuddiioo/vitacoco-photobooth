@@ -31,10 +31,22 @@ export const CaptureCountdownScreen = ({
   const [isCapturing, setIsCapturing] = useState(false);
   const [showGetReady, setShowGetReady] = useState(true); // Show "Get Ready!" initially
 
+  // DEBUG: Log all state changes
+  console.log('🔍 CAPTURE STATE:', {
+    currentPhotoIndex,
+    countdown,
+    isCapturing,
+    showGetReady,
+    photosCaptured: photos.length,
+    hasCamera: !!cameraStream,
+  });
+
   // Hide "Get Ready!" after 1 second and start countdown
   useEffect(() => {
     if (showGetReady) {
+      console.log('⏱️ Get Ready showing for 1 second...');
       const timer = setTimeout(() => {
+        console.log('✅ Get Ready finished, starting countdown');
         setShowGetReady(false);
       }, 1000);
       return () => clearTimeout(timer);
@@ -44,14 +56,30 @@ export const CaptureCountdownScreen = ({
 
   // Main synchronized photo capture sequence
   useEffect(() => {
-    if (!videoRef.current || !cameraStream) return undefined;
-    if (currentPhotoIndex >= CONSTANTS.PHOTO_COUNT) return undefined;
-    if (isCapturing) return undefined;
-    if (showGetReady) return undefined; // Wait for "Get Ready!" to finish
+    console.log('🔄 Main useEffect triggered', { countdown, currentPhotoIndex, isCapturing, showGetReady });
+    
+    if (!videoRef.current || !cameraStream) {
+      console.log('⚠️ No video or camera stream');
+      return undefined;
+    }
+    if (currentPhotoIndex >= CONSTANTS.PHOTO_COUNT) {
+      console.log('✅ All photos captured, stopping sequence');
+      return undefined;
+    }
+    if (isCapturing) {
+      console.log('⏸️ Currently capturing, waiting...');
+      return undefined;
+    }
+    if (showGetReady) {
+      console.log('⏸️ Get Ready showing, waiting...');
+      return undefined;
+    }
 
     // Countdown phase
     if (countdown > 0) {
+      console.log(`⏱️ Countdown: ${countdown}`);
       const timer = setTimeout(() => {
+        console.log(`⏱️ Countdown tick: ${countdown} → ${countdown - 1}`);
         setCountdown(prev => prev - 1);
       }, 1000);
       return () => clearTimeout(timer);
@@ -59,36 +87,51 @@ export const CaptureCountdownScreen = ({
 
     // Countdown hit 0 - START THE FLASH AND CAPTURE SEQUENCE
     if (countdown === 0) {
+      console.log(`📸 === STARTING CAPTURE SEQUENCE FOR PHOTO ${currentPhotoIndex + 1} ===`);
       setIsCapturing(true);
       
       // STEP 1: Turn on flash immediately
       setShowFlash(true);
-      console.log(`FLASH ON for photo ${currentPhotoIndex + 1}`);
+      console.log(`✨ FLASH ON for photo ${currentPhotoIndex + 1}`);
 
       // STEP 2: Capture photo at peak of flash
       const captureTimer = setTimeout(() => {
-        console.log(`CAPTURING photo ${currentPhotoIndex + 1}`);
+        console.log(`📷 CAPTURING photo ${currentPhotoIndex + 1}`);
         const photo = capturePhoto(videoRef.current!, currentPhotoIndex);
         if (photo) {
-          setPhotos(prev => [...prev, photo]);
+          console.log(`✅ Photo ${currentPhotoIndex + 1} captured successfully`);
+          setPhotos(prev => {
+            const newPhotos = [...prev, photo];
+            console.log(`📦 Photos array now has ${newPhotos.length} items`);
+            return newPhotos;
+          });
+        } else {
+          console.error(`❌ Photo ${currentPhotoIndex + 1} capture FAILED!`);
         }
       }, Math.floor(CONSTANTS.FLASH_DURATION_MS / 2));
 
       // STEP 3: Turn off flash after full duration
       const flashOffTimer = setTimeout(() => {
-        console.log(`FLASH OFF for photo ${currentPhotoIndex + 1}`);
+        console.log(`💫 FLASH OFF for photo ${currentPhotoIndex + 1}`);
         setShowFlash(false);
       }, CONSTANTS.FLASH_DURATION_MS);
 
       // STEP 4: Move to next photo after flash is complete
       const nextPhotoTimer = setTimeout(() => {
-        console.log(`Moving to photo ${currentPhotoIndex + 2}`);
+        console.log(`➡️ Moving from photo ${currentPhotoIndex + 1} to ${currentPhotoIndex + 2}`);
         setIsCapturing(false);
-        setCurrentPhotoIndex(prev => prev + 1);
+        setCurrentPhotoIndex(prev => {
+          const next = prev + 1;
+          console.log(`📍 Photo index: ${prev} → ${next}`);
+          return next;
+        });
         setCountdown(CONSTANTS.COUNTDOWN_SECONDS);
+        console.log(`🔄 Countdown reset to ${CONSTANTS.COUNTDOWN_SECONDS}`);
+        console.log(`📸 === CAPTURE SEQUENCE ${currentPhotoIndex + 1} COMPLETE ===\n`);
       }, CONSTANTS.FLASH_DURATION_MS + 300);
 
       return () => {
+        console.log(`🧹 Cleaning up timers for photo ${currentPhotoIndex + 1}`);
         clearTimeout(captureTimer);
         clearTimeout(flashOffTimer);
         clearTimeout(nextPhotoTimer);
@@ -96,12 +139,15 @@ export const CaptureCountdownScreen = ({
     }
 
     return undefined;
-  }, [countdown, currentPhotoIndex, videoRef, cameraStream, capturePhoto, isCapturing, showGetReady]);
+  }, [countdown, currentPhotoIndex, videoRef, cameraStream, isCapturing, showGetReady]); // REMOVED capturePhoto from deps!
 
   // Navigate to review when all photos captured
   useEffect(() => {
+    console.log('🎬 Completion check:', { currentPhotoIndex, photoCount: photos.length, target: CONSTANTS.PHOTO_COUNT });
     if (currentPhotoIndex === CONSTANTS.PHOTO_COUNT && photos.length === CONSTANTS.PHOTO_COUNT) {
+      console.log('🎉 ALL PHOTOS CAPTURED! Moving to review in 500ms...');
       setTimeout(() => {
+        console.log('🎉 Calling onPhotosComplete with', photos.length, 'photos');
         onPhotosComplete(photos);
       }, 500);
     }
