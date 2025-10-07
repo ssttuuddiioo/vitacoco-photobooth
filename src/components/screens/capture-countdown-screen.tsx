@@ -31,9 +31,9 @@ export const CaptureCountdownScreen = ({
   useEffect(() => {
     if (!videoRef.current || !cameraStream) return undefined;
     if (currentPhotoIndex >= CONSTANTS.PHOTO_COUNT) return undefined;
-    if (isCapturing) return undefined; // Prevent overlapping captures
+    if (isCapturing) return undefined;
 
-    // Countdown phase - only count down if countdown > 0
+    // Countdown phase
     if (countdown > 0) {
       const timer = setTimeout(() => {
         setCountdown(prev => prev - 1);
@@ -41,37 +41,41 @@ export const CaptureCountdownScreen = ({
       return () => clearTimeout(timer);
     }
 
-    // Countdown reached 0 - trigger flash and capture (ONLY after countdown completes)
-    if (countdown === 0 && !isCapturing) {
+    // Countdown hit 0 - START THE FLASH AND CAPTURE SEQUENCE
+    if (countdown === 0) {
       setIsCapturing(true);
+      
+      // STEP 1: Turn on flash immediately
       setShowFlash(true);
+      console.log(`FLASH ON for photo ${currentPhotoIndex + 1}`);
 
-      // Capture at the peak of the flash (halfway through)
-      const captureDelay = Math.floor(CONSTANTS.FLASH_DURATION_MS / 2);
+      // STEP 2: Capture photo at peak of flash
       const captureTimer = setTimeout(() => {
+        console.log(`CAPTURING photo ${currentPhotoIndex + 1}`);
         const photo = capturePhoto(videoRef.current!, currentPhotoIndex);
         if (photo) {
           setPhotos(prev => [...prev, photo]);
         }
-      }, captureDelay);
+      }, Math.floor(CONSTANTS.FLASH_DURATION_MS / 2));
 
-      // Turn off flash after full duration
-      const flashTimer = setTimeout(() => {
+      // STEP 3: Turn off flash after full duration
+      const flashOffTimer = setTimeout(() => {
+        console.log(`FLASH OFF for photo ${currentPhotoIndex + 1}`);
         setShowFlash(false);
-        
-        // Move to next photo and reset countdown after flash ends
-        const nextTimer = setTimeout(() => {
-          setIsCapturing(false);
-          setCurrentPhotoIndex(prev => prev + 1);
-          setCountdown(CONSTANTS.COUNTDOWN_SECONDS);
-        }, 200); // Brief pause after flash ends
-        
-        return () => clearTimeout(nextTimer);
       }, CONSTANTS.FLASH_DURATION_MS);
+
+      // STEP 4: Move to next photo after flash is complete
+      const nextPhotoTimer = setTimeout(() => {
+        console.log(`Moving to photo ${currentPhotoIndex + 2}`);
+        setIsCapturing(false);
+        setCurrentPhotoIndex(prev => prev + 1);
+        setCountdown(CONSTANTS.COUNTDOWN_SECONDS);
+      }, CONSTANTS.FLASH_DURATION_MS + 300);
 
       return () => {
         clearTimeout(captureTimer);
-        clearTimeout(flashTimer);
+        clearTimeout(flashOffTimer);
+        clearTimeout(nextPhotoTimer);
       };
     }
 
