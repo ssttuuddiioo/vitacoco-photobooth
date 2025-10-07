@@ -34,7 +34,8 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "public/logo/logo.png"
+      "icon": "public/logo/logo.png",
+      "sign": null
     },
     "mac": {
       "target": ["dmg"],
