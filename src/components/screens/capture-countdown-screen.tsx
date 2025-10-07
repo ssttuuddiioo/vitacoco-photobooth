@@ -22,7 +22,7 @@ export const CaptureCountdownScreen = ({
   const cameraStyle = getCameraSettingsStyle(cameraSettings);
 
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [countdown, setCountdown] = useState(CONSTANTS.COUNTDOWN_SECONDS);
+  const [countdown, setCountdown] = useState<number>(CONSTANTS.COUNTDOWN_SECONDS);
   const [showFlash, setShowFlash] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 

@@ -8,10 +8,9 @@ import { CONSTANTS, COUNTDOWN_MESSAGES } from '@/lib/constants';
 
 interface CountdownScreenProps {
   onComplete: () => void;
-  isCameraActive: boolean;
 }
 
-export const CountdownScreen = ({ onComplete, isCameraActive }: CountdownScreenProps) => {
+export const CountdownScreen = ({ onComplete }: CountdownScreenProps) => {
   // Initialize camera here so it's ready for capture screen
   const { videoRef, error: cameraError, isLoading } = useCamera();
 

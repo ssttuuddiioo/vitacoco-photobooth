@@ -9,10 +9,9 @@ import type { Photo } from '@/types';
 
 interface CaptureScreenProps {
   onPhotosComplete: (photos: Photo[]) => void;
-  isCameraActive: boolean;
 }
 
-export const CaptureScreen = ({ onPhotosComplete, isCameraActive }: CaptureScreenProps) => {
+export const CaptureScreen = ({ onPhotosComplete }: CaptureScreenProps) => {
   const { videoRef, cameraStream, error: cameraError, isLoading } = useCamera();
   const { capturePhoto, error: captureError } = usePhotoCapture();
   const [photos, setPhotos] = useState<Photo[]>([]);

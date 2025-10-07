@@ -1,7 +1,6 @@
 // Welcome screen - Vita Coco branded CTA with live camera feed
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useCamera } from '@/hooks/use-camera';
-import { Button } from '@/components/ui/button';
 import { loadCameraSettings, getCameraSettingsStyle } from '@/lib/camera-settings';
 
 interface WelcomeScreenProps {

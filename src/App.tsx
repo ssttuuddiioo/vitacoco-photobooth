@@ -20,13 +20,11 @@ export const App = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [photoStrip, setPhotoStrip] = useState<PhotoStrip | null>(null);
   const [didPrint, setDidPrint] = useState(false);
-  const [isCameraActive, setIsCameraActive] = useState(false);
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasProcessed, setHasProcessed] = useState(false);
 
-  const { requestFullscreen } = useFullscreen();
   useWakeLock();
 
   // Request fullscreen on mount (DISABLED FOR TESTING)
