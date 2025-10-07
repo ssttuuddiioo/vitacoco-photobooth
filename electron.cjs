@@ -2,6 +2,23 @@ const { app, BrowserWindow, globalShortcut, ipcMain, dialog } = require('electro
 const path = require('path');
 const fs = require('fs');
 
+// Single instance lock - prevent multiple instances from running
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  // Another instance is already running, quit this one
+  app.quit();
+} else {
+  // This is the first instance, set up focus handler
+  app.on('second-instance', () => {
+    // If someone tries to launch a second instance, focus our window instead
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
+
 let mainWindow;
 
 const createWindow = () => {
@@ -31,11 +48,14 @@ const createWindow = () => {
 
   // Prevent window from being closed
   mainWindow.on('close', (e) => {
-    // Allow closing with secret code or in development
-    if (process.env.NODE_ENV === 'development') {
-      return;
-    }
-    e.preventDefault();
+    // DEBUGGING: Allow closing for now
+    return;
+    
+    // TODO: Re-enable for production kiosk mode:
+    // if (process.env.NODE_ENV === 'development') {
+    //   return;
+    // }
+    // e.preventDefault();
   });
 };
 
