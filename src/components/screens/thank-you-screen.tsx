@@ -5,12 +5,10 @@ import { playSuccessSound } from '@/lib/animation-utils';
 
 interface ThankYouScreenProps {
   onComplete: () => void;
-  didPrint?: boolean;
 }
 
 export const ThankYouScreen = ({
   onComplete,
-  didPrint = false,
 }: ThankYouScreenProps) => {
   const [countdown, setCountdown] = useState(
     CONSTANTS.THANK_YOU_DURATION_MS / 1000
