@@ -12,7 +12,11 @@ interface UseCameraReturn {
   retry: () => void;
 }
 
-export const useCamera = (): UseCameraReturn => {
+interface UseCameraOptions {
+  deviceId?: string;
+}
+
+export const useCamera = (options?: UseCameraOptions): UseCameraReturn => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraStream, setCameraStream] = useState<CameraStream | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -30,12 +34,22 @@ export const useCamera = (): UseCameraReturn => {
         setError(null);
 
         console.log('🎥 Initializing camera... (attempt', retryCount + 1, 'of', maxRetries + 1, ')');
-        console.log('Camera constraints:', CAMERA_CONSTRAINTS);
+        
+        // Build constraints with optional deviceId
+        const constraints = options?.deviceId
+          ? {
+              video: {
+                ...CAMERA_CONSTRAINTS.video,
+                deviceId: { exact: options.deviceId }
+              },
+              audio: false
+            }
+          : CAMERA_CONSTRAINTS;
+        
+        console.log('Camera constraints:', constraints);
 
         // Request camera permission
-        stream = await navigator.mediaDevices.getUserMedia(
-          CAMERA_CONSTRAINTS
-        );
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
         
         console.log('✅ Camera stream obtained:', stream.id);
 
@@ -116,7 +130,7 @@ export const useCamera = (): UseCameraReturn => {
         cleanupMediaStream(stream);
       }
     };
-  }, [retryCount]);
+  }, [retryCount, options?.deviceId]);
 
   const retry = () => {
     setRetryCount(0);

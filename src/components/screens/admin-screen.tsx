@@ -20,9 +20,13 @@ interface AdminScreenProps {
 }
 
 export const AdminScreen = ({ onExit }: AdminScreenProps) => {
-  const { videoRef, cameraStream, error, isLoading, retry } = useCamera();
+  const [selectedCameraId, setSelectedCameraId] = useState<string>('');
+  const { videoRef, cameraStream, error, isLoading, retry } = useCamera({ 
+    deviceId: selectedCameraId || undefined 
+  });
   const [showDebug, setShowDebug] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   
   // Load saved settings on mount
   const [settings, setSettings] = useState<CameraSettings>(() => loadCameraSettings());
@@ -31,6 +35,27 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
   // Destructure for easier access
   const { zoom, brightness, contrast, saturation, cropX, cropY, rotation } = settings;
   const { filenamePrefix, saveFolderPath } = appSettings;
+
+  // Enumerate available cameras
+  useEffect(() => {
+    const getCameras = async () => {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        console.log('Available cameras:', videoDevices);
+        setCameras(videoDevices);
+        
+        // Set first camera as default if none selected
+        if (videoDevices.length > 0 && !selectedCameraId) {
+          setSelectedCameraId(videoDevices[0].deviceId);
+        }
+      } catch (err) {
+        console.error('Failed to enumerate cameras:', err);
+      }
+    };
+    
+    void getCameras();
+  }, [selectedCameraId]);
 
   // Apply filters to video
   useEffect(() => {
@@ -122,6 +147,33 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
                 </button>
                 <p className="text-xs text-gray-400">
                   Check Windows Settings → Privacy → Camera to ensure Electron/Vita has permission
+                </p>
+              </div>
+            )}
+
+            {/* Camera Selection */}
+            {cameras.length > 0 && (
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">
+                  📹 Select Camera ({cameras.length} detected)
+                </label>
+                <select
+                  value={selectedCameraId}
+                  onChange={(e) => {
+                    setSelectedCameraId(e.target.value);
+                    console.log('Camera selected:', e.target.value);
+                    retry(); // Retry with new camera
+                  }}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500"
+                >
+                  {cameras.map((camera) => (
+                    <option key={camera.deviceId} value={camera.deviceId}>
+                      {camera.label || `Camera ${camera.deviceId.substring(0, 8)}...`}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-400">
+                  If labels are empty, grant camera permission and refresh
                 </p>
               </div>
             )}

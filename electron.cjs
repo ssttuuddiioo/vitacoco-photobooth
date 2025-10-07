@@ -37,6 +37,16 @@ const createWindow = () => {
     },
   });
 
+  // Grant camera and microphone permissions automatically
+  mainWindow.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
+    console.log('Permission requested:', permission);
+    if (permission === 'media' || permission === 'mediaKeySystem') {
+      callback(true); // Grant permission
+    } else {
+      callback(false);
+    }
+  });
+
   // Load the app
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('http://localhost:5173');
