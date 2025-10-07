@@ -7,10 +7,9 @@ import palmsImg from '/logo/palms.png';
 
 interface WelcomeScreenProps {
   onStart: () => void;
-  onAdminAccess?: () => void;
 }
 
-export const WelcomeScreen = ({ onStart, onAdminAccess }: WelcomeScreenProps) => {
+export const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
   // Load saved camera settings
   const [cameraSettings] = useState(() => loadCameraSettings());
   const cameraStyle = getCameraSettingsStyle(cameraSettings);
@@ -19,25 +18,6 @@ export const WelcomeScreen = ({ onStart, onAdminAccess }: WelcomeScreenProps) =>
   const { videoRef, cameraStream, error, isLoading } = useCamera({
     deviceId: cameraSettings.deviceId
   });
-
-  // Secret admin access - tap logo 10 times quickly
-  let tapCount = 0;
-  let tapTimeout: NodeJS.Timeout;
-
-  const handleLogoTap = () => {
-    clearTimeout(tapTimeout);
-    tapCount++;
-    
-    if (tapCount >= 10 && onAdminAccess) {
-      tapCount = 0;
-      onAdminAccess();
-      return;
-    }
-
-    tapTimeout = setTimeout(() => {
-      tapCount = 0;
-    }, 2000);
-  };
 
   return (
     <div 
@@ -48,10 +28,7 @@ export const WelcomeScreen = ({ onStart, onAdminAccess }: WelcomeScreenProps) =>
       <div className="absolute inset-0 flex items-center justify-center w-full px-8">
         {/* Logo - Left (centered between left edge and camera) */}
         <div className="flex-1 flex items-center justify-center animate-slide-in-left" style={{ animationDelay: '0.1s' }}>
-          <div 
-            className="w-64 cursor-pointer"
-            onClick={handleLogoTap}
-          >
+          <div className="w-64">
             <img 
               src={logoImg} 
               alt="Vita Coco" 

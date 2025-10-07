@@ -23,6 +23,10 @@ export const App = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasProcessed, setHasProcessed] = useState(false);
 
+  // Secret hotspot counters
+  const [topLeftTaps, setTopLeftTaps] = useState(0);
+  const [topRightTaps, setTopRightTaps] = useState(0);
+
   useWakeLock();
 
   // Request fullscreen on mount (DISABLED FOR TESTING)
@@ -70,6 +74,36 @@ export const App = () => {
 
     // Request garbage collection
     forceGarbageCollection();
+  };
+
+  // Secret hotspot handlers
+  const handleTopLeftTap = () => {
+    const newCount = topLeftTaps + 1;
+    setTopLeftTaps(newCount);
+
+    if (newCount >= 3) {
+      console.log('🔄 SECRET RESTART triggered!');
+      setTopLeftTaps(0);
+      setIsAdminMode(false);
+      resetSession();
+    }
+
+    // Reset counter after 2 seconds
+    setTimeout(() => setTopLeftTaps(0), 2000);
+  };
+
+  const handleTopRightTap = () => {
+    const newCount = topRightTaps + 1;
+    setTopRightTaps(newCount);
+
+    if (newCount >= 3) {
+      console.log('⚙️ SECRET ADMIN triggered!');
+      setTopRightTaps(0);
+      setIsAdminMode(true);
+    }
+
+    // Reset counter after 2 seconds
+    setTimeout(() => setTopRightTaps(0), 2000);
   };
 
   // Idle timeout
@@ -161,7 +195,6 @@ export const App = () => {
             >
               <WelcomeScreen 
                 onStart={startSession}
-                onAdminAccess={() => setIsAdminMode(true)}
               />
             </div>
 
@@ -226,6 +259,22 @@ export const App = () => {
                 />
               )}
             </div>
+
+            {/* Secret hotspot: Top-left corner - 3 taps to RESTART */}
+            <div
+              onClick={handleTopLeftTap}
+              className="absolute top-0 left-0 w-32 h-32 z-50 cursor-pointer"
+              style={{ background: 'transparent' }}
+              title="Secret: Tap 3x to restart"
+            />
+
+            {/* Secret hotspot: Top-right corner - 3 taps for ADMIN */}
+            <div
+              onClick={handleTopRightTap}
+              className="absolute top-0 right-0 w-32 h-32 z-50 cursor-pointer"
+              style={{ background: 'transparent' }}
+              title="Secret: Tap 3x for admin"
+            />
           </>
         )}
       </div>
