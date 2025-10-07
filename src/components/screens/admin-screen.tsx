@@ -20,7 +20,7 @@ interface AdminScreenProps {
 }
 
 export const AdminScreen = ({ onExit }: AdminScreenProps) => {
-  const { videoRef, cameraStream, error, isLoading } = useCamera();
+  const { videoRef, cameraStream, error, isLoading, retry } = useCamera();
   const [showDebug, setShowDebug] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   
@@ -112,8 +112,17 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
             </div>
 
             {error && (
-              <div className="bg-red-500/20 border border-red-500 rounded-lg p-4">
-                <p className="text-red-200">{error}</p>
+              <div className="bg-red-500/20 border border-red-500 rounded-lg p-4 space-y-3">
+                <p className="text-red-200 font-medium">{error}</p>
+                <button
+                  onClick={retry}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-all"
+                >
+                  🔄 Retry Camera
+                </button>
+                <p className="text-xs text-gray-400">
+                  Check Windows Settings → Privacy → Camera to ensure Electron/Vita has permission
+                </p>
               </div>
             )}
           </div>

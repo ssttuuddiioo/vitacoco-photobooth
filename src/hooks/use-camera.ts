@@ -9,6 +9,7 @@ interface UseCameraReturn {
   cameraStream: CameraStream | null;
   error: string | null;
   isLoading: boolean;
+  retry: () => void;
 }
 
 export const useCamera = (): UseCameraReturn => {
@@ -28,10 +29,15 @@ export const useCamera = (): UseCameraReturn => {
         setIsLoading(true);
         setError(null);
 
+        console.log('🎥 Initializing camera... (attempt', retryCount + 1, 'of', maxRetries + 1, ')');
+        console.log('Camera constraints:', CAMERA_CONSTRAINTS);
+
         // Request camera permission
         stream = await navigator.mediaDevices.getUserMedia(
           CAMERA_CONSTRAINTS
         );
+        
+        console.log('✅ Camera stream obtained:', stream.id);
 
         if (!mounted) {
           cleanupMediaStream(stream);
@@ -112,6 +118,12 @@ export const useCamera = (): UseCameraReturn => {
     };
   }, [retryCount]);
 
-  return { videoRef, cameraStream, error, isLoading };
+  const retry = () => {
+    setRetryCount(0);
+    setError(null);
+    setIsLoading(true);
+  };
+
+  return { videoRef, cameraStream, error, isLoading, retry };
 };
 
