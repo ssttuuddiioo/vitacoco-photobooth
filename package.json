@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.vitacoco.photobooth",
-    "productName": "Vita Coco Photobooth",
+    "productName": "Vita",
     "files": [
       "dist/**/*",
       "electron.cjs",
