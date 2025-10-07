@@ -10,9 +10,9 @@
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
-    "electron:dev": "NODE_ENV=development electron .",
+    "electron:dev": "cross-env NODE_ENV=development electron .",
     "electron:build": "npm run build && electron-builder",
-    "electron:build:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& npm run build && electron-builder --win",
+    "electron:build:win": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false npm run build && electron-builder --win",
     "electron:build:mac": "npm run build && electron-builder --mac"
   },
   "build": {
@@ -31,13 +31,17 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "public/logo/logo.png"
     },
     "mac": {
-      "target": ["dmg"],
+      "target": [
+        "dmg"
+      ],
       "icon": "public/logo/logo.png",
       "category": "public.app-category.entertainment"
     },
@@ -61,6 +65,7 @@
     "@typescript-eslint/parser": "^6.14.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
+    "cross-env": "^10.1.0",
     "electron": "^38.2.1",
     "electron-builder": "^26.0.12",
     "eslint": "^8.55.0",
