@@ -1,5 +1,5 @@
 // Photo capture hook
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { captureFrame } from '@/lib/photo-utils';
 import { loadCameraSettings } from '@/lib/camera-settings';
 import type { Photo } from '@/types';
@@ -13,11 +13,12 @@ interface UsePhotoCaptureReturn {
 export const usePhotoCapture = (): UsePhotoCaptureReturn => {
   const [isCapturing, setIsCapturing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isCapturingRef = useRef(false);
 
   const capturePhoto = useCallback(
     (videoElement: HTMLVideoElement, index: number): Photo | null => {
-      // Guard: Check if already capturing
-      if (isCapturing) {
+      // Guard: Check if already capturing (use ref for stable check)
+      if (isCapturingRef.current) {
         return null;
       }
 
@@ -28,6 +29,7 @@ export const usePhotoCapture = (): UsePhotoCaptureReturn => {
       }
 
       try {
+        isCapturingRef.current = true;
         setIsCapturing(true);
         setError(null);
 
@@ -48,10 +50,11 @@ export const usePhotoCapture = (): UsePhotoCaptureReturn => {
         setError(errorMessage);
         return null;
       } finally {
+        isCapturingRef.current = false;
         setIsCapturing(false);
       }
     },
-    [isCapturing]
+    [] // Empty deps - function is now stable!
   );
 
   return { capturePhoto, isCapturing, error };
