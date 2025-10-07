@@ -15,12 +15,14 @@ interface CaptureCountdownScreenProps {
 export const CaptureCountdownScreen = ({
   onPhotosComplete,
 }: CaptureCountdownScreenProps) => {
-  const { videoRef, cameraStream, error, isLoading } = useCamera();
-  const { capturePhoto } = usePhotoCapture();
-  
   // Load saved camera settings
   const [cameraSettings] = useState(() => loadCameraSettings());
   const cameraStyle = getCameraSettingsStyle(cameraSettings);
+  
+  const { videoRef, cameraStream, error, isLoading } = useCamera({
+    deviceId: cameraSettings.deviceId
+  });
+  const { capturePhoto } = usePhotoCapture();
 
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [countdown, setCountdown] = useState<number>(CONSTANTS.COUNTDOWN_SECONDS);

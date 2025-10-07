@@ -11,12 +11,14 @@ interface WelcomeScreenProps {
 }
 
 export const WelcomeScreen = ({ onStart, onAdminAccess }: WelcomeScreenProps) => {
-  // Initialize camera on welcome screen so it persists throughout experience
-  const { videoRef, cameraStream, error, isLoading } = useCamera();
-  
   // Load saved camera settings
   const [cameraSettings] = useState(() => loadCameraSettings());
   const cameraStyle = getCameraSettingsStyle(cameraSettings);
+  
+  // Initialize camera on welcome screen so it persists throughout experience
+  const { videoRef, cameraStream, error, isLoading } = useCamera({
+    deviceId: cameraSettings.deviceId
+  });
 
   // Secret admin access - tap logo 10 times quickly
   let tapCount = 0;

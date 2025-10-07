@@ -8,6 +8,7 @@ export interface CameraSettings {
   cropX: number;
   cropY: number;
   rotation: number;
+  deviceId?: string; // Optional: specific camera device to use
 }
 
 const DEFAULT_SETTINGS: CameraSettings = {
@@ -18,6 +19,7 @@ const DEFAULT_SETTINGS: CameraSettings = {
   cropX: 0,
   cropY: 0,
   rotation: 0,
+  deviceId: undefined, // Use system default camera
 };
 
 const STORAGE_KEY = 'photobooth-camera-settings';

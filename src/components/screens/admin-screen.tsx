@@ -20,17 +20,18 @@ interface AdminScreenProps {
 }
 
 export const AdminScreen = ({ onExit }: AdminScreenProps) => {
-  const [selectedCameraId, setSelectedCameraId] = useState<string>('');
+  // Load saved settings on mount
+  const [settings, setSettings] = useState<CameraSettings>(() => loadCameraSettings());
+  const [appSettings, setAppSettings] = useState<AppSettings>(() => loadAppSettings());
+  
+  // Initialize selected camera from saved settings
+  const [selectedCameraId, setSelectedCameraId] = useState<string>(settings.deviceId || '');
   const { videoRef, cameraStream, error, isLoading, retry } = useCamera({ 
     deviceId: selectedCameraId || undefined 
   });
   const [showDebug, setShowDebug] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
-  
-  // Load saved settings on mount
-  const [settings, setSettings] = useState<CameraSettings>(() => loadCameraSettings());
-  const [appSettings, setAppSettings] = useState<AppSettings>(() => loadAppSettings());
   
   // Destructure for easier access
   const { zoom, brightness, contrast, saturation, cropX, cropY, rotation } = settings;
@@ -160,8 +161,11 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
                 <select
                   value={selectedCameraId}
                   onChange={(e) => {
-                    setSelectedCameraId(e.target.value);
-                    console.log('Camera selected:', e.target.value);
+                    const deviceId = e.target.value;
+                    setSelectedCameraId(deviceId);
+                    setSettings(prev => ({ ...prev, deviceId })); // Update settings
+                    setSaveStatus('idle'); // Reset save status to show user needs to save
+                    console.log('Camera selected:', deviceId);
                     retry(); // Retry with new camera
                   }}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500"
