@@ -26,12 +26,25 @@ export const CaptureCountdownScreen = ({
   const [showFlash, setShowFlash] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [showGetReady, setShowGetReady] = useState(true); // Show "Get Ready!" initially
+
+  // Hide "Get Ready!" after 1 second and start countdown
+  useEffect(() => {
+    if (showGetReady) {
+      const timer = setTimeout(() => {
+        setShowGetReady(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [showGetReady]);
 
   // Main synchronized photo capture sequence
   useEffect(() => {
     if (!videoRef.current || !cameraStream) return undefined;
     if (currentPhotoIndex >= CONSTANTS.PHOTO_COUNT) return undefined;
     if (isCapturing) return undefined;
+    if (showGetReady) return undefined; // Wait for "Get Ready!" to finish
 
     // Countdown phase
     if (countdown > 0) {
@@ -80,7 +93,7 @@ export const CaptureCountdownScreen = ({
     }
 
     return undefined;
-  }, [countdown, currentPhotoIndex, videoRef, cameraStream, capturePhoto, isCapturing]);
+  }, [countdown, currentPhotoIndex, videoRef, cameraStream, capturePhoto, isCapturing, showGetReady]);
 
   // Navigate to review when all photos captured
   useEffect(() => {
@@ -136,10 +149,17 @@ export const CaptureCountdownScreen = ({
 
       {/* Main Content - Horizontal Layout: Countdown | Camera | Palms */}
       <div className="absolute inset-0 flex items-center justify-center w-full px-8">
-        {/* Countdown - Left (centered between left edge and camera) */}
+        {/* Countdown / Get Ready - Left (centered between left edge and camera) */}
         <div className="flex-1 flex items-center justify-center">
-          {countdown > 0 && currentPhotoIndex < CONSTANTS.PHOTO_COUNT && (
+          {showGetReady && currentPhotoIndex < CONSTANTS.PHOTO_COUNT && (
             <div className="animate-scale-in">
+              <div className="text-7xl font-bold text-white drop-shadow-2xl">
+                Get Ready!
+              </div>
+            </div>
+          )}
+          {!showGetReady && countdown > 0 && currentPhotoIndex < CONSTANTS.PHOTO_COUNT && (
+            <div className="animate-scale-in" key={countdown}>
               <div className="text-[15rem] font-bold text-white drop-shadow-2xl leading-none">
                 {countdown}
               </div>
