@@ -29,21 +29,11 @@ export const FlashOverlay = ({ trigger, onComplete }: FlashOverlayProps) => {
   if (!isVisible) return null;
 
   return (
-    <>
-      {/* Main flash - Clean white flash */}
-      <div
-        className="fixed inset-0 bg-white pointer-events-none z-50 animate-flash"
-        aria-hidden="true"
-      />
-      
-      {/* Flash burst effect */}
-      <div
-        className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center"
-        aria-hidden="true"
-      >
-        <div className="w-32 h-32 bg-white/80 rounded-full blur-3xl animate-ping" />
-      </div>
-    </>
+    // ONLY full white screen flash - no burst effects
+    <div
+      className="fixed inset-0 bg-white pointer-events-none z-50"
+      aria-hidden="true"
+    />
   );
 };
 
