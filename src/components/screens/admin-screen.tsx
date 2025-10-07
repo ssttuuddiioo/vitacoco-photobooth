@@ -46,7 +46,7 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
         setCameras(videoDevices);
         
         // Set first camera as default if none selected
-        if (videoDevices.length > 0 && !selectedCameraId) {
+        if (videoDevices.length > 0 && !selectedCameraId && videoDevices[0]) {
           setSelectedCameraId(videoDevices[0].deviceId);
         }
       } catch (err) {
