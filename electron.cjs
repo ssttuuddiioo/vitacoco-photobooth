@@ -5,10 +5,12 @@ let mainWindow;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    fullscreen: true,
-    kiosk: true,
-    frame: false,
-    autoHideMenuBar: true,
+    width: 1400,
+    height: 900,
+    fullscreen: false, // Disabled for debugging
+    kiosk: false, // Disabled for debugging
+    frame: true, // Enabled for debugging
+    autoHideMenuBar: false,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -20,9 +22,10 @@ const createWindow = () => {
   // Load the app
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('http://localhost:5173');
-    // mainWindow.webContents.openDevTools(); // Uncomment for debugging
+    mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
+    mainWindow.webContents.openDevTools(); // Enable DevTools to see errors
   }
 
   // Prevent window from being closed
