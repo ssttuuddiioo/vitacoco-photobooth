@@ -14,6 +14,7 @@ import {
   saveAppSettings,
   type AppSettings,
 } from '@/lib/app-settings';
+import { getElectronAPI } from '@/lib/electron-api';
 
 interface AdminScreenProps {
   onExit: () => void;
@@ -30,7 +31,7 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
   
   // Destructure for easier access
   const { zoom, brightness, contrast, saturation, cropX, cropY, rotation } = settings;
-  const { filenamePrefix } = appSettings;
+  const { filenamePrefix, saveFolderPath } = appSettings;
 
   // Apply filters to video
   useEffect(() => {
@@ -60,6 +61,17 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
     const defaults = resetCameraSettings();
     setSettings(defaults);
     setSaveStatus('idle');
+  };
+
+  const handleSelectFolder = async () => {
+    const { selectFolder } = await import('@/lib/electron-api');
+    const folderPath = await selectFolder();
+    
+    if (folderPath) {
+      setAppSettings(prev => ({ ...prev, saveFolderPath: folderPath }));
+      setSaveStatus('idle');
+      alert(`Folder selected: ${folderPath}\n\nDon't forget to click "Save Settings"!`);
+    }
   };
 
   return (
@@ -270,7 +282,7 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
               {/* Filename Prefix */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium mb-2">
-                  Save Location / Filename Prefix
+                  Filename Prefix
                 </label>
                 <input
                   type="text"
@@ -284,6 +296,39 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
                 />
                 <p className="text-xs text-gray-400 mt-1">
                   Files will be saved as: {filenamePrefix || 'photobooth'}-[timestamp].jpg
+                </p>
+              </div>
+
+              {/* Save Folder Selection */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">
+                  Save Folder Location
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSelectFolder}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-all"
+                  >
+                    📁 Select Folder
+                  </button>
+                  {saveFolderPath && (
+                    <button
+                      onClick={() => {
+                        setAppSettings(prev => ({ ...prev, saveFolderPath: '' }));
+                        setSaveStatus('idle');
+                      }}
+                      className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-all"
+                    >
+                      ✕ Clear
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  {saveFolderPath ? (
+                    <>✓ Saving to: <strong>{saveFolderPath}</strong></>
+                  ) : (
+                    <>No folder selected - files will download to Downloads folder</>
+                  )}
                 </p>
               </div>
             </div>

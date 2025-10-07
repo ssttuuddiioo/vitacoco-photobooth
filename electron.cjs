@@ -1,5 +1,6 @@
-const { app, BrowserWindow, globalShortcut } = require('electron');
+const { app, BrowserWindow, globalShortcut, ipcMain, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 let mainWindow;
 
@@ -37,6 +38,38 @@ const createWindow = () => {
     e.preventDefault();
   });
 };
+
+// IPC handlers for file operations
+ipcMain.handle('select-folder', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory']
+  });
+  
+  if (result.canceled) {
+    return null;
+  }
+  
+  return result.filePaths[0];
+});
+
+ipcMain.handle('save-file', async (event, { folderPath, filename, dataUrl }) => {
+  try {
+    // Convert base64 data URL to buffer
+    const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // Create full file path
+    const filePath = path.join(folderPath, filename);
+    
+    // Save file
+    await fs.promises.writeFile(filePath, buffer);
+    
+    return { success: true, filePath };
+  } catch (error) {
+    console.error('Failed to save file:', error);
+    return { success: false, error: error.message };
+  }
+});
 
 app.whenReady().then(() => {
   createWindow();

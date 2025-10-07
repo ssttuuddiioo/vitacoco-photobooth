@@ -2,10 +2,12 @@
 
 export interface AppSettings {
   filenamePrefix: string;
+  saveFolderPath: string;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
   filenamePrefix: 'photobooth',
+  saveFolderPath: '', // Empty means use Downloads folder
 };
 
 const STORAGE_KEY = 'photobooth-app-settings';
