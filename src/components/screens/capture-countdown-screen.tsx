@@ -1,5 +1,5 @@
 // Combined countdown and capture screen - Vita Coco style
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useCamera } from '@/hooks/use-camera';
 import { usePhotoCapture } from '@/hooks/use-photo-capture';
 import { FlashOverlay } from '@/components/ui/flash-overlay';
@@ -28,14 +28,16 @@ export const CaptureCountdownScreen = ({
   const [countdown, setCountdown] = useState<number>(CONSTANTS.COUNTDOWN_SECONDS);
   const [showFlash, setShowFlash] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [isCapturing, setIsCapturing] = useState(false);
   const [showGetReady, setShowGetReady] = useState(true); // Show "Get Ready!" initially
+  
+  // Use ref for isCapturing to avoid triggering effect re-runs
+  const isCapturingRef = useRef(false);
 
   // DEBUG: Log all state changes
   console.log('🔍 CAPTURE STATE:', {
     currentPhotoIndex,
     countdown,
-    isCapturing,
+    isCapturing: isCapturingRef.current,
     showGetReady,
     photosCaptured: photos.length,
     hasCamera: !!cameraStream,
@@ -56,7 +58,7 @@ export const CaptureCountdownScreen = ({
 
   // Main synchronized photo capture sequence
   useEffect(() => {
-    console.log('🔄 Main useEffect triggered', { countdown, currentPhotoIndex, isCapturing, showGetReady });
+    console.log('🔄 Main useEffect triggered', { countdown, currentPhotoIndex, isCapturing: isCapturingRef.current, showGetReady });
     
     if (!videoRef.current || !cameraStream) {
       console.log('⚠️ No video or camera stream');
@@ -66,7 +68,7 @@ export const CaptureCountdownScreen = ({
       console.log('✅ All photos captured, stopping sequence');
       return undefined;
     }
-    if (isCapturing) {
+    if (isCapturingRef.current) {
       console.log('⏸️ Currently capturing, waiting...');
       return undefined;
     }
@@ -88,7 +90,8 @@ export const CaptureCountdownScreen = ({
     // Countdown hit 0 - START THE FLASH AND CAPTURE SEQUENCE
     if (countdown === 0) {
       console.log(`📸 === STARTING CAPTURE SEQUENCE FOR PHOTO ${currentPhotoIndex + 1} ===`);
-      setIsCapturing(true);
+      isCapturingRef.current = true;
+      console.log(`🔒 isCapturing locked = true`);
       
       // STEP 1: Turn on flash immediately
       setShowFlash(true);
@@ -119,7 +122,8 @@ export const CaptureCountdownScreen = ({
       // STEP 4: Move to next photo after flash is complete
       const nextPhotoTimer = setTimeout(() => {
         console.log(`➡️ Moving from photo ${currentPhotoIndex + 1} to ${currentPhotoIndex + 2}`);
-        setIsCapturing(false);
+        isCapturingRef.current = false;
+        console.log(`🔓 isCapturing unlocked = false`);
         setCurrentPhotoIndex(prev => {
           const next = prev + 1;
           console.log(`📍 Photo index: ${prev} → ${next}`);
@@ -139,7 +143,7 @@ export const CaptureCountdownScreen = ({
     }
 
     return undefined;
-  }, [countdown, currentPhotoIndex, videoRef, cameraStream, isCapturing, showGetReady]); // REMOVED capturePhoto from deps!
+  }, [countdown, currentPhotoIndex, videoRef, cameraStream, showGetReady]); // Using isCapturingRef instead of state!
 
   // Navigate to review when all photos captured
   useEffect(() => {
