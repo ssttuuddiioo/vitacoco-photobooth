@@ -50,7 +50,7 @@ export const ReviewScreen = ({
     <div 
       className="relative h-screen transition-all duration-500 overflow-hidden animate-fade-in"
       style={{ 
-        backgroundColor: '#F6F1EB'
+        backgroundColor: '#388046' // Vita Coco green
       }}
     >
       {/* Photo Strip - Absolute center of screen */}

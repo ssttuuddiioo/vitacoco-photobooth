@@ -33,6 +33,11 @@ export const CaptureCountdownScreen = ({
   // Use ref for isCapturing to avoid triggering effect re-runs
   const isCapturingRef = useRef(false);
 
+  // DEBUG: Log flash state changes
+  useEffect(() => {
+    console.log(`🎆 FLASH STATE CHANGED: ${showFlash ? 'ON' : 'OFF'}`);
+  }, [showFlash]);
+
   // DEBUG: Log all state changes
   console.log('🔍 CAPTURE STATE:', {
     currentPhotoIndex,
