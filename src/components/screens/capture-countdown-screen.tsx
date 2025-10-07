@@ -25,13 +25,15 @@ export const CaptureCountdownScreen = ({
   const [countdown, setCountdown] = useState<number>(CONSTANTS.COUNTDOWN_SECONDS);
   const [showFlash, setShowFlash] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   // Main synchronized photo capture sequence
   useEffect(() => {
     if (!videoRef.current || !cameraStream) return undefined;
     if (currentPhotoIndex >= CONSTANTS.PHOTO_COUNT) return undefined;
+    if (isCapturing) return undefined; // Prevent overlapping captures
 
-    // Countdown phase
+    // Countdown phase - only count down if countdown > 0
     if (countdown > 0) {
       const timer = setTimeout(() => {
         setCountdown(prev => prev - 1);
@@ -39,8 +41,9 @@ export const CaptureCountdownScreen = ({
       return () => clearTimeout(timer);
     }
 
-    // Countdown reached 0 - trigger flash and capture
-    if (countdown === 0) {
+    // Countdown reached 0 - trigger flash and capture (ONLY after countdown completes)
+    if (countdown === 0 && !isCapturing) {
+      setIsCapturing(true);
       setShowFlash(true);
 
       // Capture at the peak of the flash (halfway through)
@@ -57,10 +60,13 @@ export const CaptureCountdownScreen = ({
         setShowFlash(false);
         
         // Move to next photo and reset countdown after flash ends
-        setTimeout(() => {
+        const nextTimer = setTimeout(() => {
+          setIsCapturing(false);
           setCurrentPhotoIndex(prev => prev + 1);
           setCountdown(CONSTANTS.COUNTDOWN_SECONDS);
         }, 200); // Brief pause after flash ends
+        
+        return () => clearTimeout(nextTimer);
       }, CONSTANTS.FLASH_DURATION_MS);
 
       return () => {
@@ -70,7 +76,7 @@ export const CaptureCountdownScreen = ({
     }
 
     return undefined;
-  }, [countdown, currentPhotoIndex, videoRef, cameraStream, capturePhoto]);
+  }, [countdown, currentPhotoIndex, videoRef, cameraStream, capturePhoto, isCapturing]);
 
   // Navigate to review when all photos captured
   useEffect(() => {
