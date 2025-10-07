@@ -43,22 +43,30 @@ export const CaptureCountdownScreen = ({
     if (countdown === 0) {
       setShowFlash(true);
 
-      // Capture after flash is visible
+      // Capture at the peak of the flash (halfway through)
+      const captureDelay = Math.floor(CONSTANTS.FLASH_DURATION_MS / 2);
       const captureTimer = setTimeout(() => {
         const photo = capturePhoto(videoRef.current!, currentPhotoIndex);
         if (photo) {
           setPhotos(prev => [...prev, photo]);
         }
-        setShowFlash(false);
+      }, captureDelay);
 
-        // Move to next photo and reset countdown after a pause
+      // Turn off flash after full duration
+      const flashTimer = setTimeout(() => {
+        setShowFlash(false);
+        
+        // Move to next photo and reset countdown after flash ends
         setTimeout(() => {
           setCurrentPhotoIndex(prev => prev + 1);
           setCountdown(CONSTANTS.COUNTDOWN_SECONDS);
-        }, 300); // Pause before next countdown starts
-      }, CONSTANTS.FLASH_DURATION_MS); // Use full flash duration
+        }, 200); // Brief pause after flash ends
+      }, CONSTANTS.FLASH_DURATION_MS);
 
-      return () => clearTimeout(captureTimer);
+      return () => {
+        clearTimeout(captureTimer);
+        clearTimeout(flashTimer);
+      };
     }
 
     return undefined;
@@ -144,7 +152,7 @@ export const CaptureCountdownScreen = ({
             playsInline
             muted
             className="absolute inset-0 w-full h-full object-cover transition-all duration-200"
-            style={cameraStyle}
+            style={{ ...cameraStyle, transform: `${cameraStyle.transform || ''} scaleX(-1)`.trim() }}
           />
 
           {/* Loading state */}

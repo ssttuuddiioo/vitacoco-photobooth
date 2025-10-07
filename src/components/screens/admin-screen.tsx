@@ -9,6 +9,11 @@ import {
   applyCameraSettings,
   type CameraSettings,
 } from '@/lib/camera-settings';
+import {
+  loadAppSettings,
+  saveAppSettings,
+  type AppSettings,
+} from '@/lib/app-settings';
 
 interface AdminScreenProps {
   onExit: () => void;
@@ -21,9 +26,11 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
   
   // Load saved settings on mount
   const [settings, setSettings] = useState<CameraSettings>(() => loadCameraSettings());
+  const [appSettings, setAppSettings] = useState<AppSettings>(() => loadAppSettings());
   
   // Destructure for easier access
   const { zoom, brightness, contrast, saturation, cropX, cropY, rotation } = settings;
+  const { filenamePrefix } = appSettings;
 
   // Apply filters to video
   useEffect(() => {
@@ -41,6 +48,7 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
   const handleSaveSettings = () => {
     setSaveStatus('saving');
     saveCameraSettings(settings);
+    saveAppSettings(appSettings);
     
     setTimeout(() => {
       setSaveStatus('saved');
@@ -109,7 +117,7 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
               className="w-full h-full object-contain transition-all duration-200"
               style={{
                 filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`,
-                transform: `scale(${zoom}) translateX(${cropX}%) translateY(${cropY}%) rotate(${rotation}deg)`,
+                transform: `scale(${zoom}) translateX(${cropX}%) translateY(${cropY}%) rotate(${rotation}deg) scaleX(-1)`,
               }}
             />
             {!cameraStream && !isLoading && (
@@ -257,6 +265,26 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
                   onChange={(e) => updateSetting('rotation', parseInt(e.target.value))}
                   className="w-full"
                 />
+              </div>
+
+              {/* Filename Prefix */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">
+                  Save Location / Filename Prefix
+                </label>
+                <input
+                  type="text"
+                  value={filenamePrefix}
+                  onChange={(e) => {
+                    setAppSettings(prev => ({ ...prev, filenamePrefix: e.target.value }));
+                    setSaveStatus('idle');
+                  }}
+                  placeholder="photobooth"
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Files will be saved as: {filenamePrefix || 'photobooth'}-[timestamp].jpg
+                </p>
               </div>
             </div>
 

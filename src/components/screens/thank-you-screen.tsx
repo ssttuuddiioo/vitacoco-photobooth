@@ -47,16 +47,9 @@ export const ThankYouScreen = ({
             Thank You!
           </h1>
 
-          {didPrint && (
-            <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <p className="text-5xl font-bold text-white">Your photos have been saved</p>
-              <p className="text-3xl text-white/90">Check your downloads folder</p>
-            </div>
-          )}
-
-          {!didPrint && (
-            <p className="text-5xl text-white font-bold animate-fade-in" style={{ animationDelay: '0.3s' }}>Enjoy your photo strip!</p>
-          )}
+          <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <p className="text-5xl font-bold text-white">Your pictures are now printing</p>
+          </div>
         </div>
       </div>
 

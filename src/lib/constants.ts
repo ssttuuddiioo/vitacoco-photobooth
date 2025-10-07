@@ -9,8 +9,8 @@ export const CONSTANTS = {
   CANVAS_STRIP_HEIGHT: 1200, // Strip height
   PHOTO_WIDTH: 346, // Photo width
   PHOTO_HEIGHT: 317, // Photo height
-  FLASH_DURATION_MS: 200,
-  THANK_YOU_DURATION_MS: 10000,
+  FLASH_DURATION_MS: 300, // Increased for more visible flash
+  THANK_YOU_DURATION_MS: 15000, // 15 seconds
 } as const;
 
 export const CAMERA_CONSTRAINTS = {

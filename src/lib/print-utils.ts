@@ -1,5 +1,6 @@
 // Print utilities for photo booth
 import { generatePrintLayout } from '@/lib/photo-utils';
+import { loadAppSettings } from '@/lib/app-settings';
 
 /**
  * Save print layout to downloads folder
@@ -21,9 +22,13 @@ export const printPhotoStrip = async (stripUrl: string): Promise<void> => {
     // Generate 4x6 print layout (single centered strip)
     const printLayout = await generatePrintLayout(stripUrl);
     
-    // Generate filename with timestamp
+    // Load app settings for filename prefix
+    const appSettings = loadAppSettings();
+    const prefix = appSettings.filenamePrefix || 'photobooth';
+    
+    // Generate filename with prefix and timestamp
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `photobooth-${timestamp}.jpg`;
+    const filename = `${prefix}-${timestamp}.jpg`;
     
     // Save to downloads folder
     downloadPrintFile(printLayout, filename);

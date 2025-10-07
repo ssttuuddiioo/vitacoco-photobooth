@@ -72,7 +72,7 @@ export const WelcomeScreen = ({ onStart, onAdminAccess }: WelcomeScreenProps) =>
             playsInline
             muted
             className="absolute inset-0 w-full h-full object-cover transition-all duration-200"
-            style={cameraStyle}
+            style={{ ...cameraStyle, transform: `${cameraStyle.transform || ''} scaleX(-1)`.trim() }}
           />
 
           {/* Loading state */}
