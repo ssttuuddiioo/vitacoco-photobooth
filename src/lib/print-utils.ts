@@ -1,5 +1,4 @@
 // Print utilities for photo booth
-import { generatePrintLayout } from '@/lib/photo-utils';
 import { loadAppSettings } from '@/lib/app-settings';
 import { saveFile } from '@/lib/electron-api';
 
@@ -16,12 +15,12 @@ const downloadPrintFile = (dataUrl: string, filename: string): void => {
 };
 
 /**
- * Save photo strip - uses selected folder if available, otherwise downloads
+ * Save photo strip - saves single 400x1200 column (no duplication)
  */
 export const printPhotoStrip = async (stripUrl: string): Promise<void> => {
   try {
-    // Generate 4x6 print layout (single centered strip)
-    const printLayout = await generatePrintLayout(stripUrl);
+    // Save the strip directly (400x1200 - single column, 3 photos)
+    // No duplication - just one column 2x6
     
     // Load app settings
     const appSettings = loadAppSettings();
@@ -31,7 +30,7 @@ export const printPhotoStrip = async (stripUrl: string): Promise<void> => {
     
     // Try to save to selected folder (works in both Electron and modern browsers)
     if (appSettings.saveFolderPath) {
-      const result = await saveFile(filename, printLayout, appSettings.saveFolderPath);
+      const result = await saveFile(filename, stripUrl, appSettings.saveFolderPath);
       
       if (result.success) {
         console.log('File saved to:', result.filePath);
@@ -43,7 +42,7 @@ export const printPhotoStrip = async (stripUrl: string): Promise<void> => {
     }
     
     // Fallback: Browser download to Downloads folder
-    downloadPrintFile(printLayout, filename);
+    downloadPrintFile(stripUrl, filename);
     return Promise.resolve();
   } catch (error) {
     throw error;
