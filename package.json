@@ -12,7 +12,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "electron:dev": "NODE_ENV=development electron .",
     "electron:build": "npm run build && electron-builder",
-    "electron:build:win": "npm run build && electron-builder --win",
+    "electron:build:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& npm run build && electron-builder --win",
     "electron:build:mac": "npm run build && electron-builder --mac"
   },
   "build": {
@@ -34,8 +34,7 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "public/logo/logo.png",
-      "sign": null
+      "icon": "public/logo/logo.png"
     },
     "mac": {
       "target": ["dmg"],
