@@ -1,230 +1,134 @@
-# Photo Booth Kiosk Application
+# Vita Coco Photobooth
 
-A touch-optimized photo booth application built with React + Vite for kiosk deployment.
+A professional photobooth application built with React + Electron for kiosk installations.
 
 ## Features
 
-- 📸 **4-Photo Capture** - Automatic capture with 3-second intervals
-- 🖨️ **Print Ready** - Generate and print professional photo strips
-- 🔒 **Kiosk Hardening** - Fullscreen mode, wake lock, disabled shortcuts
-- ♻️ **Auto-Reset** - 30-second idle timeout returns to welcome screen
-- 📱 **Touch Optimized** - Large buttons (150px+) with haptic feedback
-- 🎨 **Modern UI** - Animated particles, confetti, and smooth transitions
-- 🧹 **Memory Management** - Aggressive cleanup between sessions
-- ✨ **Enhanced Animations** - Flash effects, countdowns, and celebrations
-- 🎉 **Confetti Effects** - Animated celebrations on success
-- 🛡️ **Error Boundaries** - Graceful error handling and recovery
-- 🔊 **Interactive Feedback** - Haptic vibration and sound support
+- **Full Photo Experience**
+  - Touch-to-start welcome screen with live camera preview
+  - 3-photo capture with synchronized countdown
+  - Real-time camera view during capture
+  - Photo strip generation (400x1200px)
+  - Print-ready postcard layout (800x1200px, cuts into 2 strips)
+  - Smooth transitions between screens
+
+- **Admin Controls**
+  - Secret access: tap logo 10 times
+  - Camera filters: brightness, contrast, saturation
+  - Zoom, crop, and rotation controls
+  - Settings persist via localStorage
+
+- **Kiosk Mode**
+  - Fullscreen, frameless window
+  - All keyboard shortcuts disabled
+  - Exit code: `Ctrl + Shift + Alt + Q`
+  - Auto-retry camera initialization
+  - Wake lock support
+
+- **Professional UI**
+  - Vita Coco branded design
+  - Touch-optimized controls
+  - Minimalist animations
+  - Responsive layouts
+
+## Quick Start (Development)
+
+```bash
+npm install
+npm run dev
+```
+
+Open browser to `http://localhost:5173`
+
+## Building for Windows
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete Windows installation instructions.
+
+```bash
+# Build Windows installer from Mac
+npm run electron:build:win
+
+# Or on Windows machine
+git clone https://github.com/ssttuuddiioo/vitacoco-photobooth.git
+cd vitacoco-photobooth
+npm install
+npm run electron:build:win
+```
 
 ## Tech Stack
 
-- **Framework**: React 18 + Vite
-- **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS
-- **Validation**: Zod
-- **Architecture**: Pure client-side SPA with state machine
+- **React 18** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **Tailwind CSS** - Styling
+- **Electron** - Desktop app wrapper
+- **Zod** - Runtime validation
 
 ## Project Structure
 
 ```
-photobooth/
-├── src/
-│   ├── components/
-│   │   ├── screens/          # Screen components (welcome, capture, etc.)
-│   │   ├── ui/                # Reusable UI components
-│   │   └── photo-strip.tsx    # Photo strip display
-│   ├── hooks/                 # Custom React hooks
-│   ├── lib/                   # Utilities and pure functions
-│   ├── types/                 # TypeScript type definitions
-│   ├── styles/                # Global CSS
-│   ├── App.tsx                # Main state machine
-│   └── main.tsx               # Entry point
-├── public/                    # Static assets
-└── [config files]
+src/
+├── components/
+│   ├── screens/        # Main app screens
+│   └── ui/             # Reusable UI components
+├── hooks/              # Custom React hooks
+├── lib/                # Utilities and helpers
+├── pages/              # Routes (preview page)
+├── styles/             # Global CSS
+└── types/              # TypeScript definitions
+
+public/
+└── logo/               # Brand assets
+
+electron.cjs            # Electron main process
+preload.cjs            # Electron preload script
 ```
 
-## Getting Started
+## Development vs Production
 
-### Prerequisites
+### Development Mode
+- Window mode (not fullscreen)
+- DevTools available
+- Hot reload
+- `npm run dev`
 
-- Node.js 18+ and npm
-- Webcam/camera device
-- Modern browser (Chrome/Edge recommended for kiosk)
+### Production Mode
+- Fullscreen kiosk
+- No browser UI
+- Keyboard shortcuts disabled
+- Exit: `Ctrl + Shift + Alt + Q`
 
-### Installation
+## Camera Settings
 
-```bash
-# Install dependencies
-npm install
+Admin panel includes:
+- **Filters**: Brightness, contrast, saturation
+- **Zoom**: 1x - 3x
+- **Crop**: Horizontal and vertical positioning
+- **Rotation**: 0° - 359°
 
-# Start development server
-npm run dev
+Settings are saved locally and applied to all captured photos.
 
-# Build for production
-npm run build
+## Photo Strip Details
 
-# Preview production build
-npm run preview
-```
+- **Preview Strip**: 400x1200px (3 photos vertically)
+- **Print Layout**: 800x1200px (2 strips side-by-side)
+- **Photo Size**: 346x317px each
+- **Spacing**: 30px between photos, 100px bottom margin
+- **Background**: Vita Coco green (#388046)
 
-### Development
-
-The app will be available at `http://localhost:5173`
-
-For testing on a touch device on the same network:
-```bash
-# Server runs on all network interfaces
-npm run dev
-# Access via http://YOUR_IP:5173
-```
-
-## Usage Flow
-
-1. **Welcome Screen** - Tap "START" to begin
-2. **Countdown** - 3-2-1 countdown before photos
-3. **Capture** - 4 photos captured automatically (3s intervals)
-4. **Review** - View photo strip, choose "PRINT" or "REDO"
-5. **Thank You** - Confirmation screen (auto-resets in 10s)
-
-## Kiosk Mode
-
-The app includes built-in kiosk hardening:
-
-- ✅ Fullscreen API (automatic)
-- ✅ Wake Lock API (prevent screen sleep)
-- ✅ Disabled: right-click, F11, F12, Ctrl+Shift+I, text selection
-- ✅ Touch-optimized (no zoom, no overscroll)
-- ✅ Idle timeout (30s auto-reset)
-
-### Optional: Electron Wrapper
-
-For true kiosk mode on Windows, wrap with Electron:
-
-```bash
-npm install -D electron electron-builder
-```
-
-See `electron-main.js` example in project documentation.
-
-## Configuration
-
-Edit constants in `src/lib/constants.ts`:
-
-```typescript
-export const CONSTANTS = {
-  PHOTO_COUNT: 4,              // Number of photos per session
-  COUNTDOWN_SECONDS: 3,        // Initial countdown
-  PHOTO_INTERVAL_MS: 3000,     // Time between photos
-  IDLE_TIMEOUT_MS: 30000,      // Auto-reset timeout
-  CANVAS_WIDTH: 400,           // Photo strip width
-  CANVAS_STRIP_HEIGHT: 1600,   // Photo strip height
-  // ...
-};
-```
+The printer cuts the 800x1200 postcard in half, giving users 2 identical strips.
 
 ## Browser Compatibility
 
-| Feature | Chrome | Edge | Safari | Firefox |
-|---------|--------|------|--------|---------|
-| Camera API | ✅ | ✅ | ✅ | ✅ |
-| Fullscreen | ✅ | ✅ | ✅ | ✅ |
-| Wake Lock | ✅ | ✅ | ⚠️ iOS 16.4+ | ❌ |
-| Print API | ✅ | ✅ | ✅ | ✅ |
-
-**Recommended**: Chrome or Edge for best kiosk support
-
-## Development Commands
-
-```bash
-npm run dev        # Start dev server
-npm run build      # Build for production
-npm run preview    # Preview production build
-npm run lint       # Run ESLint
-npm run format     # Format with Prettier
-```
-
-## Deployment
-
-### Production Build
-
-```bash
-npm run build
-# Output: dist/
-```
-
-Serve the `dist/` folder with any static file server:
-
-```bash
-# Example with serve
-npx serve dist
-
-# Example with nginx, Apache, or other web server
-```
-
-### Windows Kiosk Setup
-
-1. Build production version
-2. Set up Electron or use browser kiosk mode:
-
-**Chrome Kiosk Mode:**
-```bash
-chrome.exe --kiosk --app=http://localhost:5173
-```
-
-**Edge Kiosk Mode:**
-```bash
-msedge.exe --kiosk --app=http://localhost:5173
-```
-
-3. Configure Windows to auto-launch on startup
-4. Disable Windows shortcuts (Alt+Tab, Win key, etc.) via Group Policy
-
-## Memory Management
-
-The app aggressively manages memory to prevent leaks during extended kiosk operation:
-
-- Photo URLs revoked after session ends
-- Canvas elements cleaned up after use
-- Media streams stopped properly
-- Garbage collection requested on idle
-
-Tested stable for 50+ consecutive sessions.
-
-## Troubleshooting
-
-### Camera Not Working
-
-1. Check browser permissions (allow camera access)
-2. Verify camera is not in use by another app
-3. Try refreshing the page
-4. Check console for error messages
-
-### Fullscreen Not Working
-
-- User gesture required - click "START" button
-- Some browsers block fullscreen in iframe
-- Check browser permissions
-
-### Print Not Working
-
-- Ensure print dialog is not blocked
-- Check printer connection
-- Browser must allow window.open()
-
-## Future Enhancements
-
-- [ ] Email/SMS sharing
-- [ ] Custom frame overlays
-- [ ] Sound effects
-- [ ] Admin settings panel
-- [ ] Multi-language support
-- [ ] Analytics tracking
+Tested on:
+- Chrome/Edge (recommended for kiosk)
+- Firefox
+- Safari
 
 ## License
 
-Proprietary - All rights reserved
+Proprietary - Vita Coco
 
-## Support
+---
 
-For issues or questions, contact the development team.
-
+For deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
