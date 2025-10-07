@@ -4,6 +4,7 @@ import { PhotoStrip } from '@/components/photo-strip';
 import { printPhotoStrip } from '@/lib/print-utils';
 import { playSuccessSound, triggerHaptic } from '@/lib/animation-utils';
 import type { PhotoStrip as PhotoStripType } from '@/types';
+import palmsImg from '/logo/palms.png';
 
 interface ReviewScreenProps {
   photoStrip: PhotoStripType;
@@ -63,7 +64,7 @@ export const ReviewScreen = ({
       <div className="absolute bottom-0 top-0 flex items-end pb-32 animate-slide-in-left" style={{ right: 'calc(50% + 250px)', animationDelay: '0.2s' }}>
         <div style={{ width: '212px' }}>
           <img 
-            src="/logo/palms2.png" 
+            src={palmsImg} 
             alt="Palms" 
             className="w-full h-auto drop-shadow-2xl"
           />

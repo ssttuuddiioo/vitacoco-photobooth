@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useCamera } from '@/hooks/use-camera';
 import { loadCameraSettings, getCameraSettingsStyle } from '@/lib/camera-settings';
+import logoImg from '/logo/logo.png';
+import palmsImg from '/logo/palms.png';
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -49,7 +51,7 @@ export const WelcomeScreen = ({ onStart, onAdminAccess }: WelcomeScreenProps) =>
             onClick={handleLogoTap}
           >
             <img 
-              src="/logo/logo.png" 
+              src={logoImg} 
               alt="Vita Coco" 
               className="w-full h-auto drop-shadow-2xl"
             />
@@ -100,7 +102,7 @@ export const WelcomeScreen = ({ onStart, onAdminAccess }: WelcomeScreenProps) =>
         {/* Palms Image - Right (centered between camera and right edge) */}
         <div className="flex-1 flex items-center justify-center animate-slide-in-right" style={{ animationDelay: '0.3s' }}>
           <img
-            src="/logo/palms.png"
+            src={palmsImg}
             alt="Palms"
             className="max-w-xs h-auto object-contain drop-shadow-2xl"
           />

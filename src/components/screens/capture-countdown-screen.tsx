@@ -6,6 +6,7 @@ import { FlashOverlay } from '@/components/ui/flash-overlay';
 import { CONSTANTS } from '@/lib/constants';
 import { loadCameraSettings, getCameraSettingsStyle } from '@/lib/camera-settings';
 import type { Photo } from '@/types';
+import palmsImg from '/logo/palms.png';
 
 interface CaptureCountdownScreenProps {
   onPhotosComplete: (photos: Photo[]) => void;
@@ -199,7 +200,7 @@ export const CaptureCountdownScreen = ({
         {/* Palms Image - Right (centered between camera and right edge) */}
         <div className="flex-1 flex items-center justify-center">
           <img
-            src="/logo/palms.png"
+            src={palmsImg}
             alt="Palms"
             className="max-w-xs h-auto object-contain drop-shadow-2xl"
           />
