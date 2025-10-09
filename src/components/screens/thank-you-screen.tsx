@@ -48,7 +48,7 @@ export const ThankYouScreen = ({
           </h1>
 
           <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <p className="text-5xl font-bold text-white">Your pictures are now printing</p>
+            <p className="text-5xl font-bold text-white">Your pictures will print momentarily</p>
           </div>
         </div>
       </div>
