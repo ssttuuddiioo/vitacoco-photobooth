@@ -48,20 +48,20 @@ export const ReviewScreen = ({
 
   return (
     <div 
-      className="relative h-screen transition-all duration-500 overflow-hidden animate-fade-in"
+      className="relative h-screen transition-all duration-500 overflow-hidden animate-fade-in py-16"
       style={{ 
         backgroundColor: '#388046' // Vita Coco green
       }}
     >
-      {/* Photo Strip - Absolute center of screen */}
-      <div className="absolute inset-0 flex items-center justify-center">
+      {/* Photo Strip - Centered with padding */}
+      <div className="absolute inset-0 flex items-center justify-center py-16">
         <div className="animate-slide-down" style={{ maxWidth: '400px', width: '100%', animationDelay: '0.1s' }}>
           <PhotoStrip photoStrip={photoStrip} />
         </div>
       </div>
 
-      {/* Palms Image - 50px from strip's left edge, 2x bigger */}
-      <div className="absolute bottom-0 top-0 flex items-end pb-32 animate-slide-in-left" style={{ right: 'calc(50% + 250px)', animationDelay: '0.2s' }}>
+      {/* Palms Image - 50px from strip's left edge */}
+      <div className="absolute inset-y-16 flex items-end pb-32 animate-slide-in-left" style={{ right: 'calc(50% + 250px)', animationDelay: '0.2s' }}>
         <div style={{ width: '212px' }}>
           <img 
             src={palmsImg} 
@@ -71,9 +71,9 @@ export const ReviewScreen = ({
         </div>
       </div>
 
-      {/* Buttons - 50px from strip's right edge */}
-      <div className="absolute top-0 bottom-0 flex items-center" style={{ left: 'calc(50% + 200px + 50px)', paddingTop: '700px' }}>
-        <div className="flex flex-col animate-slide-in-right items-start" style={{ gap: '50px', animationDelay: '0.3s' }}>
+      {/* Buttons - 50px from strip's right edge, properly contained */}
+      <div className="absolute inset-y-16 flex items-center" style={{ left: 'calc(50% + 200px + 50px)' }}>
+        <div className="flex flex-col animate-slide-in-right items-start" style={{ gap: '30px', animationDelay: '0.3s', paddingBottom: '80px' }}>
           <button
             onClick={handlePrint}
             disabled={isPrinting}
