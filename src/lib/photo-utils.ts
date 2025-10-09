@@ -93,8 +93,8 @@ export const captureFrame = (video: HTMLVideoElement, settings?: CameraSettings)
   // Restore context state
   ctx.restore();
 
-  // Convert to JPEG with quality compression
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+  // Convert to JPEG with quality compression optimized for printing
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
   // Cleanup
   canvas.width = 0;
@@ -224,7 +224,8 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
   });
 
   // Return data URL after everything is complete
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+  // Use 0.85 quality for faster printing - DNP printers don't need ultra-high quality
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
   // Cleanup
   canvas.width = 0;
