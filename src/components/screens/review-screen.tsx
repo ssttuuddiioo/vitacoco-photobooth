@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { PhotoStrip } from '@/components/photo-strip';
 import { printPhotoStrip } from '@/lib/print-utils';
 import { playSuccessSound, triggerHaptic } from '@/lib/animation-utils';
+import { loadAppSettings } from '@/lib/app-settings';
 import type { PhotoStrip as PhotoStripType } from '@/types';
 import palmsImg from '/logo/palms.png';
 
@@ -19,6 +20,7 @@ export const ReviewScreen = ({
 }: ReviewScreenProps) => {
   const [isPrinting, setIsPrinting] = useState(false);
   const [printError, setPrintError] = useState<string | null>(null);
+  const [appSettings] = useState(() => loadAppSettings());
 
   const handlePrint = async () => {
     try {
@@ -50,7 +52,7 @@ export const ReviewScreen = ({
     <div 
       className="relative h-screen transition-all duration-500 overflow-hidden animate-fade-in py-16"
       style={{ 
-        backgroundColor: '#388046' // Vita Coco green
+        backgroundColor: appSettings.reviewBackgroundColor
       }}
     >
       {/* Photo Strip - Centered with padding */}

@@ -1,5 +1,6 @@
 // Processing screen with animated progress bar
 import { useEffect, useState, useRef } from 'react';
+import { loadAppSettings } from '@/lib/app-settings';
 
 interface ProcessingScreenProps {
   onComplete: () => void;
@@ -8,6 +9,7 @@ interface ProcessingScreenProps {
 export const ProcessingScreen = ({ onComplete }: ProcessingScreenProps) => {
   const [progress, setProgress] = useState(0);
   const hasCompleted = useRef(false);
+  const [appSettings] = useState(() => loadAppSettings());
 
   useEffect(() => {
     // Prevent multiple runs
@@ -40,7 +42,7 @@ export const ProcessingScreen = ({ onComplete }: ProcessingScreenProps) => {
   return (
     <div
       className="relative h-screen overflow-hidden transition-all duration-500 animate-fade-in"
-      style={{ backgroundColor: '#388046' }}
+      style={{ backgroundColor: appSettings.processingBackgroundColor }}
     >
       <div className="absolute inset-0 flex items-center justify-center w-full px-8">
         {/* Left spacer */}

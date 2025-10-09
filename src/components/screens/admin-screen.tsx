@@ -35,7 +35,20 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
   
   // Destructure for easier access
   const { zoom, brightness, contrast, saturation, cropX, cropY, rotation } = settings;
-  const { filenamePrefix, saveFolderPath, stripBackgroundColor } = appSettings;
+  const { 
+    filenamePrefix, 
+    saveFolderPath, 
+    stripBackgroundColor, 
+    watermarkImageUrl, 
+    watermarkScale, 
+    watermarkBottomOffset,
+    welcomeBackgroundColor,
+    countdownBackgroundColor,
+    captureBackgroundColor,
+    processingBackgroundColor,
+    reviewBackgroundColor,
+    thankYouBackgroundColor
+  } = appSettings;
 
   // Enumerate available cameras
   useEffect(() => {
@@ -97,6 +110,26 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
       setSaveStatus('idle');
       alert(`Folder selected: ${folderPath}\n\nDon't forget to click "Save Settings"!`);
     }
+  };
+
+  const handleWatermarkUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file (PNG, JPG, etc.)');
+      return;
+    }
+
+    // Read file as data URL
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setAppSettings(prev => ({ ...prev, watermarkImageUrl: dataUrl }));
+      setSaveStatus('idle');
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -436,6 +469,316 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
                 <p className="text-xs text-gray-400 mt-1">
                   Choose the background color for the photo strip (Default: Vita Coco Green #388046)
                 </p>
+              </div>
+            </div>
+
+            {/* Watermark Upload Section */}
+            <div className="bg-gray-900 rounded-lg p-6 space-y-4 mt-6">
+              <h3 className="text-xl font-bold mb-4">Bottom Watermark / Logo</h3>
+              
+              {/* Upload Watermark */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Upload Custom Watermark Image
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleWatermarkUpload}
+                    className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer"
+                  />
+                  {watermarkImageUrl && (
+                    <button
+                      onClick={() => {
+                        setAppSettings(prev => ({ ...prev, watermarkImageUrl: '' }));
+                        setSaveStatus('idle');
+                      }}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm transition-all"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Upload a PNG or JPG logo. Leave empty to use default bottom.png
+                </p>
+              </div>
+
+              {/* Watermark Preview */}
+              {watermarkImageUrl && (
+                <div className="bg-black/30 rounded-lg p-4">
+                  <p className="text-sm font-medium mb-2">Preview:</p>
+                  <img 
+                    src={watermarkImageUrl} 
+                    alt="Watermark preview" 
+                    className="max-h-32 mx-auto object-contain"
+                  />
+                </div>
+              )}
+
+              {/* Watermark Scale */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Watermark Width: {(watermarkScale * 100).toFixed(0)}% of strip width
+                </label>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="1.5"
+                  step="0.05"
+                  value={watermarkScale}
+                  onChange={(e) => {
+                    setAppSettings(prev => ({ ...prev, watermarkScale: parseFloat(e.target.value) }));
+                    setSaveStatus('idle');
+                  }}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>50% (Smaller)</span>
+                  <span>90% (Default)</span>
+                  <span>150% (Larger)</span>
+                </div>
+              </div>
+
+              {/* Bottom Offset */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Bottom Spacing: {watermarkBottomOffset}px from bottom edge
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="80"
+                  step="5"
+                  value={watermarkBottomOffset}
+                  onChange={(e) => {
+                    setAppSettings(prev => ({ ...prev, watermarkBottomOffset: parseInt(e.target.value) }));
+                    setSaveStatus('idle');
+                  }}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>0px (Bottom Edge)</span>
+                  <span>20px (Default)</span>
+                  <span>80px (More Space)</span>
+                </div>
+              </div>
+
+              {/* Reset Watermark Settings */}
+              <div className="flex justify-end">
+                <button
+                  onClick={() => {
+                    setAppSettings(prev => ({ 
+                      ...prev, 
+                      watermarkImageUrl: '',
+                      watermarkScale: 0.9,
+                      watermarkBottomOffset: 20
+                    }));
+                    setSaveStatus('idle');
+                  }}
+                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-all"
+                >
+                  Reset Watermark Settings
+                </button>
+              </div>
+
+              <div className="bg-blue-500/20 border border-blue-500 rounded-lg p-3 text-sm text-blue-200">
+                💡 <strong>Tip:</strong> Upload a transparent PNG for best results. The watermark will be centered horizontally at the bottom of the photo strip.
+              </div>
+            </div>
+
+            {/* Page Background Colors Section */}
+            <div className="bg-gray-900 rounded-lg p-6 space-y-4 mt-6">
+              <h3 className="text-xl font-bold mb-4">Page Background Colors</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Welcome Screen */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Welcome Screen
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={welcomeBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, welcomeBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="w-16 h-10 rounded-lg cursor-pointer border-2 border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={welcomeBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, welcomeBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Countdown Screen */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Countdown Screen
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={countdownBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, countdownBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="w-16 h-10 rounded-lg cursor-pointer border-2 border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={countdownBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, countdownBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Capture Screen */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Capture Screen
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={captureBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, captureBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="w-16 h-10 rounded-lg cursor-pointer border-2 border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={captureBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, captureBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Processing Screen */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Processing Screen
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={processingBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, processingBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="w-16 h-10 rounded-lg cursor-pointer border-2 border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={processingBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, processingBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Review Screen */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Review Screen
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={reviewBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, reviewBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="w-16 h-10 rounded-lg cursor-pointer border-2 border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={reviewBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, reviewBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Thank You Screen */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Thank You Screen
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={thankYouBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, thankYouBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="w-16 h-10 rounded-lg cursor-pointer border-2 border-gray-600"
+                    />
+                    <input
+                      type="text"
+                      value={thankYouBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, thankYouBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-green-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Reset Page Colors */}
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={() => {
+                    setAppSettings(prev => ({ 
+                      ...prev, 
+                      welcomeBackgroundColor: '#388046',
+                      countdownBackgroundColor: '#388046',
+                      captureBackgroundColor: '#388046',
+                      processingBackgroundColor: '#388046',
+                      reviewBackgroundColor: '#388046',
+                      thankYouBackgroundColor: '#388046',
+                    }));
+                    setSaveStatus('idle');
+                  }}
+                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-all"
+                >
+                  Reset All Page Colors to Default
+                </button>
+              </div>
+
+              <div className="bg-green-500/20 border border-green-500 rounded-lg p-3 text-sm text-green-200">
+                🎨 <strong>Tip:</strong> Match your brand colors! Remember to click "Save Settings" after making changes.
               </div>
             </div>
 

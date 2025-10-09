@@ -178,17 +178,19 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
         height: bottomImg.height
       });
       
-      // Calculate position to center the bottom image in the bottom space
-      const bottomImgWidth = stripWidth * 0.9; // 90% of strip width for padding
+      // Calculate position using custom settings
+      const bottomImgWidth = stripWidth * appSettings.watermarkScale;
       const bottomImgHeight = (bottomImg.height / bottomImg.width) * bottomImgWidth;
       const bottomX = (stripWidth - bottomImgWidth) / 2;
-      const bottomY = stripHeight - bottomSpace + (bottomSpace - bottomImgHeight) / 2;
+      const bottomY = stripHeight - bottomImgHeight - appSettings.watermarkBottomOffset;
       
       console.log('Drawing bottom image at:', {
         x: bottomX,
         y: bottomY,
         width: bottomImgWidth,
-        height: bottomImgHeight
+        height: bottomImgHeight,
+        scale: appSettings.watermarkScale,
+        offset: appSettings.watermarkBottomOffset
       });
       
       // Ensure full opacity
@@ -203,12 +205,12 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
         bottomImgHeight
       );
       
-      console.log('Bottom image drawn successfully');
+      console.log('✅ Bottom image drawn successfully');
       resolve();
     };
     bottomImg.onerror = (err) => {
       console.error('❌ Failed to load bottom branding image, using text fallback', err);
-      console.error('Attempted path:', bottomBrandingImg);
+      console.error('Attempted path:', appSettings.watermarkImageUrl || bottomBrandingImg);
       // Fallback to text if image fails to load
       const brandingY = stripHeight - 60;
       ctx.fillStyle = '#FFFFFF';
@@ -219,8 +221,10 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
       ctx.fillText('Montauk General Store', stripWidth / 2, brandingY + 30);
       resolve();
     };
-    console.log('Loading bottom branding image from:', bottomBrandingImg);
-    bottomImg.src = bottomBrandingImg;
+    // Use custom watermark if uploaded, otherwise use default bottom.png
+    const watermarkSrc = appSettings.watermarkImageUrl || bottomBrandingImg;
+    console.log('Loading bottom branding image from:', watermarkSrc);
+    bottomImg.src = watermarkSrc;
   });
 
   // Return data URL after everything is complete

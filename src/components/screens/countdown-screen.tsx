@@ -1,9 +1,10 @@
 // Countdown screen - 3-2-1 display before photo capture
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useCountdown } from '@/hooks/use-countdown';
 import { useCamera } from '@/hooks/use-camera';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
 import { playBeepSound, triggerHaptic } from '@/lib/animation-utils';
+import { loadAppSettings } from '@/lib/app-settings';
 import { CONSTANTS, COUNTDOWN_MESSAGES } from '@/lib/constants';
 
 interface CountdownScreenProps {
@@ -13,6 +14,7 @@ interface CountdownScreenProps {
 export const CountdownScreen = ({ onComplete }: CountdownScreenProps) => {
   // Initialize camera here so it's ready for capture screen
   const { videoRef, error: cameraError, isLoading } = useCamera();
+  const [appSettings] = useState(() => loadAppSettings());
 
   const { count } = useCountdown({
     seconds: CONSTANTS.COUNTDOWN_SECONDS,
@@ -33,7 +35,7 @@ export const CountdownScreen = ({ onComplete }: CountdownScreenProps) => {
   // Show error if camera fails
   if (cameraError && !isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-red-500 to-orange-500 text-white p-8">
+      <div className="flex flex-col items-center justify-center min-h-screen text-white p-8" style={{ backgroundColor: appSettings.countdownBackgroundColor }}>
         <div className="text-center space-y-8 animate-fade-in">
           <div className="text-9xl mb-4">📷</div>
           <h2 className="text-5xl font-bold mb-4">Camera Error</h2>
@@ -45,7 +47,7 @@ export const CountdownScreen = ({ onComplete }: CountdownScreenProps) => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 overflow-hidden relative">
+    <div className="flex flex-col items-center justify-center min-h-screen overflow-hidden relative" style={{ backgroundColor: appSettings.countdownBackgroundColor }}>
       {/* Hidden video element for camera warmup */}
       <video
         ref={videoRef}

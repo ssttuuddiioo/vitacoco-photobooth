@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useCamera } from '@/hooks/use-camera';
 import { loadCameraSettings, getCameraSettingsStyle } from '@/lib/camera-settings';
+import { loadAppSettings } from '@/lib/app-settings';
 import logoImg from '/logo/logo.png';
 import palmsImg from '/logo/palms.png';
 
@@ -12,6 +13,7 @@ interface WelcomeScreenProps {
 export const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
   // Load saved camera settings
   const [cameraSettings] = useState(() => loadCameraSettings());
+  const [appSettings] = useState(() => loadAppSettings());
   const cameraStyle = getCameraSettingsStyle(cameraSettings);
   
   // Initialize camera on welcome screen so it persists throughout experience
@@ -22,7 +24,7 @@ export const WelcomeScreen = ({ onStart }: WelcomeScreenProps) => {
   return (
     <div 
       className="relative min-h-screen overflow-hidden transition-all duration-500 animate-fade-in"
-      style={{ backgroundColor: '#388046' }} // Vita Coco green
+      style={{ backgroundColor: appSettings.welcomeBackgroundColor }}
     >
       {/* Main Content - Horizontal Layout: Logo | Camera | Palms */}
       <div className="absolute inset-0 flex items-center justify-center w-full px-8">

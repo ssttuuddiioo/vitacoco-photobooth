@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { CONSTANTS } from '@/lib/constants';
 import { playSuccessSound } from '@/lib/animation-utils';
+import { loadAppSettings } from '@/lib/app-settings';
 
 interface ThankYouScreenProps {
   onComplete: () => void;
@@ -13,6 +14,7 @@ export const ThankYouScreen = ({
   const [countdown, setCountdown] = useState(
     CONSTANTS.THANK_YOU_DURATION_MS / 1000
   );
+  const [appSettings] = useState(() => loadAppSettings());
 
   // Play success sound on mount
   useEffect(() => {
@@ -37,7 +39,7 @@ export const ThankYouScreen = ({
   return (
     <div 
       className="flex flex-col items-center justify-between h-screen transition-all duration-500 overflow-hidden py-16 animate-fade-in"
-      style={{ backgroundColor: '#388046' }}
+      style={{ backgroundColor: appSettings.thankYouBackgroundColor }}
     >
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-12 animate-slide-up">

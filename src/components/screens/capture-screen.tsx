@@ -4,6 +4,7 @@ import { useCamera } from '@/hooks/use-camera';
 import { usePhotoCapture } from '@/hooks/use-photo-capture';
 import { FlashOverlay } from '@/components/ui/flash-overlay';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
+import { loadAppSettings } from '@/lib/app-settings';
 import { CONSTANTS, PHOTO_PROMPTS } from '@/lib/constants';
 import type { Photo } from '@/types';
 
@@ -17,6 +18,7 @@ export const CaptureScreen = ({ onPhotosComplete }: CaptureScreenProps) => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [countdown, setCountdown] = useState(CONSTANTS.PHOTO_INTERVAL_MS / 1000);
   const [showFlash, setShowFlash] = useState(false);
+  const [appSettings] = useState(() => loadAppSettings());
 
   // Countdown timer for next photo
   useEffect(() => {
@@ -94,7 +96,7 @@ export const CaptureScreen = ({ onPhotosComplete }: CaptureScreenProps) => {
     : PHOTO_PROMPTS[photos.length % PHOTO_PROMPTS.length];
 
   return (
-    <div className="relative min-h-screen bg-black overflow-hidden flex items-center justify-center">
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center" style={{ backgroundColor: appSettings.captureBackgroundColor }}>
       {/* Video preview - centered and contained */}
       <video
         ref={videoRef}
