@@ -1,6 +1,5 @@
 // Flash overlay effect for camera capture
-import { useEffect, useState } from 'react';
-import { CONSTANTS } from '@/lib/constants';
+import { useEffect } from 'react';
 import { playShutterSound, triggerHaptic } from '@/lib/animation-utils';
 
 interface FlashOverlayProps {
@@ -9,30 +8,29 @@ interface FlashOverlayProps {
 }
 
 export const FlashOverlay = ({ trigger, onComplete }: FlashOverlayProps) => {
-  const [isVisible, setIsVisible] = useState(false);
-
   useEffect(() => {
     if (!trigger) return;
 
-    setIsVisible(true);
+    // Play sound and haptic immediately for instant feedback
     playShutterSound();
     triggerHaptic('heavy');
-
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-      onComplete?.();
-    }, CONSTANTS.FLASH_DURATION_MS);
-
-    return () => clearTimeout(timer);
+    
+    // Call onComplete if provided (but capture screen now handles timing)
+    onComplete?.();
   }, [trigger, onComplete]);
 
-  if (!isVisible) return null;
+  // Show flash only when triggered
+  if (!trigger) return null;
 
   return (
     // ONLY full white screen flash - no burst effects
+    // Using CSS transition for smoother performance
     <div
-      className="fixed inset-0 bg-white pointer-events-none z-50"
+      className="fixed inset-0 bg-white pointer-events-none z-50 animate-flash"
       aria-hidden="true"
+      style={{
+        animation: 'flash 0.2s ease-out forwards'
+      }}
     />
   );
 };

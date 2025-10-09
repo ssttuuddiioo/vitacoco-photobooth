@@ -43,15 +43,23 @@ export const CaptureScreen = ({ onPhotosComplete }: CaptureScreenProps) => {
     }
 
     const timer = setTimeout(() => {
-      setShowFlash(true);
+      // Use requestAnimationFrame for better performance
+      requestAnimationFrame(() => {
+        setShowFlash(true);
 
-      setTimeout(() => {
-        const photo = capturePhoto(videoRef.current!, photos.length);
-        if (photo) {
-          setPhotos(prev => [...prev, photo]);
-        }
-        setShowFlash(false);
-      }, 100);
+        // Capture immediately on next frame for instant feedback
+        requestAnimationFrame(() => {
+          const photo = capturePhoto(videoRef.current!, photos.length);
+          if (photo) {
+            setPhotos(prev => [...prev, photo]);
+          }
+          
+          // Clear flash after FLASH_DURATION_MS
+          setTimeout(() => {
+            setShowFlash(false);
+          }, CONSTANTS.FLASH_DURATION_MS);
+        });
+      });
     }, CONSTANTS.PHOTO_INTERVAL_MS);
 
     return () => clearTimeout(timer);
