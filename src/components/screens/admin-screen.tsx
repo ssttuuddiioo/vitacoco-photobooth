@@ -35,7 +35,7 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
   
   // Destructure for easier access
   const { zoom, brightness, contrast, saturation, cropX, cropY, rotation } = settings;
-  const { filenamePrefix, saveFolderPath } = appSettings;
+  const { filenamePrefix, saveFolderPath, stripBackgroundColor } = appSettings;
 
   // Enumerate available cameras
   useEffect(() => {
@@ -393,6 +393,48 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
                   ) : (
                     <>No folder selected - files will download to Downloads folder</>
                   )}
+                </p>
+              </div>
+
+              {/* Photo Strip Background Color */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">
+                  Photo Strip Background Color
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="color"
+                    value={stripBackgroundColor}
+                    onChange={(e) => {
+                      setAppSettings(prev => ({ ...prev, stripBackgroundColor: e.target.value }));
+                      setSaveStatus('idle');
+                    }}
+                    className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-600"
+                  />
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={stripBackgroundColor}
+                      onChange={(e) => {
+                        setAppSettings(prev => ({ ...prev, stripBackgroundColor: e.target.value }));
+                        setSaveStatus('idle');
+                      }}
+                      placeholder="#388046"
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500"
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      setAppSettings(prev => ({ ...prev, stripBackgroundColor: '#388046' }));
+                      setSaveStatus('idle');
+                    }}
+                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-all"
+                  >
+                    Reset to Default
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Choose the background color for the photo strip (Default: Vita Coco Green #388046)
                 </p>
               </div>
             </div>

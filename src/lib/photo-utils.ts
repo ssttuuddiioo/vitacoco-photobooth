@@ -1,6 +1,7 @@
 // Pure functions for photo operations
 import { CONSTANTS } from '@/lib/constants';
 import { loadCameraSettings, type CameraSettings } from '@/lib/camera-settings';
+import { loadAppSettings } from '@/lib/app-settings';
 import type { Photo } from '@/types';
 
 /**
@@ -110,6 +111,9 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
     throw new Error(`Photo strip requires exactly ${CONSTANTS.PHOTO_COUNT} photos`);
   }
 
+  // Load app settings for custom background color
+  const appSettings = loadAppSettings();
+
   // Exact specifications
   const stripWidth = 400;
   const stripHeight = 1200;
@@ -127,8 +131,8 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
     throw new Error('Failed to get canvas context');
   }
 
-  // Vita Coco green background
-  ctx.fillStyle = '#388046';
+  // Use custom background color from settings
+  ctx.fillStyle = appSettings.stripBackgroundColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Calculate top padding to center photos vertically
@@ -139,7 +143,7 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
   const startX = (stripWidth - photoWidth) / 2;
 
   // Load and draw photos - wait for all to complete
-  const promises = photos.map((photo, index) => {
+  const photoPromises = photos.map((photo, index) => {
     return new Promise<void>((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
@@ -161,18 +165,43 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
     });
   });
 
-  // Wait for all images to load
-  await Promise.all(promises);
+  // Wait for all photo images to load
+  await Promise.all(photoPromises);
 
-  // Add Vita Coco and Montauk branding at bottom (in the 100px space)
-  const brandingY = stripHeight - 60;
-  
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 24px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('VITA COCO', stripWidth / 2, brandingY);
-  ctx.font = '18px sans-serif';
-  ctx.fillText('Montauk General Store', stripWidth / 2, brandingY + 30);
+  // Load and draw bottom branding image
+  await new Promise<void>((resolve) => {
+    const bottomImg = new Image();
+    bottomImg.onload = () => {
+      // Calculate position to center the bottom image in the bottom space
+      const bottomImgWidth = stripWidth * 0.9; // 90% of strip width for padding
+      const bottomImgHeight = (bottomImg.height / bottomImg.width) * bottomImgWidth;
+      const bottomX = (stripWidth - bottomImgWidth) / 2;
+      const bottomY = stripHeight - bottomSpace + (bottomSpace - bottomImgHeight) / 2;
+      
+      ctx.drawImage(
+        bottomImg,
+        bottomX,
+        bottomY,
+        bottomImgWidth,
+        bottomImgHeight
+      );
+      
+      resolve();
+    };
+    bottomImg.onerror = () => {
+      console.error('Failed to load bottom branding image, using text fallback');
+      // Fallback to text if image fails to load
+      const brandingY = stripHeight - 60;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 24px Futura, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('VITA COCO', stripWidth / 2, brandingY);
+      ctx.font = '18px Futura, sans-serif';
+      ctx.fillText('Montauk General Store', stripWidth / 2, brandingY + 30);
+      resolve();
+    };
+    bottomImg.src = '/bottom.png';
+  });
 
   // Return data URL after everything is complete
   const dataUrl = canvas.toDataURL('image/jpeg', 0.95);

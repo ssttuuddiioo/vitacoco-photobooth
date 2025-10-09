@@ -3,11 +3,13 @@
 export interface AppSettings {
   filenamePrefix: string;
   saveFolderPath: string;
+  stripBackgroundColor: string;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
   filenamePrefix: 'photobooth',
   saveFolderPath: '', // Empty means use Downloads folder
+  stripBackgroundColor: '#388046', // Vita Coco green
 };
 
 const STORAGE_KEY = 'photobooth-app-settings';
