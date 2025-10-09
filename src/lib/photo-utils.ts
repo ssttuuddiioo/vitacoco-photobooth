@@ -168,16 +168,32 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
   // Wait for all photo images to load
   await Promise.all(photoPromises);
 
-  // Load and draw bottom branding image
+  // Load and draw bottom branding image (drawn LAST so it's on top layer)
   await new Promise<void>((resolve) => {
     const bottomImg = new Image();
     bottomImg.onload = () => {
+      console.log('Bottom branding image loaded successfully', {
+        width: bottomImg.width,
+        height: bottomImg.height
+      });
+      
       // Calculate position to center the bottom image in the bottom space
       const bottomImgWidth = stripWidth * 0.9; // 90% of strip width for padding
       const bottomImgHeight = (bottomImg.height / bottomImg.width) * bottomImgWidth;
       const bottomX = (stripWidth - bottomImgWidth) / 2;
       const bottomY = stripHeight - bottomSpace + (bottomSpace - bottomImgHeight) / 2;
       
+      console.log('Drawing bottom image at:', {
+        x: bottomX,
+        y: bottomY,
+        width: bottomImgWidth,
+        height: bottomImgHeight
+      });
+      
+      // Ensure full opacity
+      ctx.globalAlpha = 1.0;
+      
+      // Draw bottom image on TOP layer (last to be drawn)
       ctx.drawImage(
         bottomImg,
         bottomX,
@@ -186,10 +202,11 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
         bottomImgHeight
       );
       
+      console.log('Bottom image drawn successfully');
       resolve();
     };
-    bottomImg.onerror = () => {
-      console.error('Failed to load bottom branding image, using text fallback');
+    bottomImg.onerror = (err) => {
+      console.error('Failed to load bottom branding image, using text fallback', err);
       // Fallback to text if image fails to load
       const brandingY = stripHeight - 60;
       ctx.fillStyle = '#FFFFFF';
@@ -200,6 +217,7 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
       ctx.fillText('Montauk General Store', stripWidth / 2, brandingY + 30);
       resolve();
     };
+    console.log('Loading bottom branding image from: /bottom.png');
     bottomImg.src = '/bottom.png';
   });
 
