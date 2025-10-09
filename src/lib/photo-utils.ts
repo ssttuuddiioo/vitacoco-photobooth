@@ -3,6 +3,7 @@ import { CONSTANTS } from '@/lib/constants';
 import { loadCameraSettings, type CameraSettings } from '@/lib/camera-settings';
 import { loadAppSettings } from '@/lib/app-settings';
 import type { Photo } from '@/types';
+import bottomBrandingImg from '/bottom.png';
 
 /**
  * Apply camera settings to canvas context
@@ -206,7 +207,8 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
       resolve();
     };
     bottomImg.onerror = (err) => {
-      console.error('Failed to load bottom branding image, using text fallback', err);
+      console.error('❌ Failed to load bottom branding image, using text fallback', err);
+      console.error('Attempted path:', bottomBrandingImg);
       // Fallback to text if image fails to load
       const brandingY = stripHeight - 60;
       ctx.fillStyle = '#FFFFFF';
@@ -217,8 +219,8 @@ export const generatePhotoStrip = async (photos: Photo[]): Promise<string> => {
       ctx.fillText('Montauk General Store', stripWidth / 2, brandingY + 30);
       resolve();
     };
-    console.log('Loading bottom branding image from: /bottom.png');
-    bottomImg.src = '/bottom.png';
+    console.log('Loading bottom branding image from:', bottomBrandingImg);
+    bottomImg.src = bottomBrandingImg;
   });
 
   // Return data URL after everything is complete
