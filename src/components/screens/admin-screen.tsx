@@ -34,7 +34,7 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   
   // Destructure for easier access
-  const { zoom, brightness, contrast, saturation, cropX, cropY, rotation } = settings;
+  const { zoom, brightness, contrast, saturation, cropX, cropY, rotation, focusMode } = settings;
   const { 
     filenamePrefix, 
     saveFolderPath, 
@@ -374,6 +374,27 @@ export const AdminScreen = ({ onExit }: AdminScreenProps) => {
                   onChange={(e) => updateSetting('rotation', parseInt(e.target.value))}
                   className="w-full"
                 />
+              </div>
+
+              {/* Focus Mode */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium mb-2">
+                  Autofocus Mode
+                </label>
+                <select
+                  value={focusMode}
+                  onChange={(e) => {
+                    updateSetting('focusMode', e.target.value as 'manual' | 'continuous' | 'single-shot');
+                  }}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-green-500"
+                >
+                  <option value="manual">Manual (No Autofocus) - Recommended</option>
+                  <option value="continuous">Continuous (Always Autofocus)</option>
+                  <option value="single-shot">Single-Shot (Focus Once)</option>
+                </select>
+                <p className="text-xs text-gray-400 mt-1">
+                  Manual mode prevents constant refocusing during photos. Not all cameras support all modes.
+                </p>
               </div>
 
               {/* Filename Prefix */}

@@ -1,6 +1,7 @@
 // Camera hook for accessing user media with auto-retry for reliability
 import { useEffect, useRef, useState } from 'react';
 import { CAMERA_CONSTRAINTS } from '@/lib/constants';
+import { loadCameraSettings } from '@/lib/camera-settings';
 import { cleanupMediaStream } from '@/lib/memory-utils';
 import type { CameraStream } from '@/types';
 
@@ -14,6 +15,7 @@ interface UseCameraReturn {
 
 interface UseCameraOptions {
   deviceId?: string;
+  focusMode?: string;
 }
 
 export const useCamera = (options?: UseCameraOptions): UseCameraReturn => {
@@ -35,16 +37,18 @@ export const useCamera = (options?: UseCameraOptions): UseCameraReturn => {
 
         console.log('🎥 Initializing camera... (attempt', retryCount + 1, 'of', maxRetries + 1, ')');
         
-        // Build constraints with optional deviceId
-        const constraints = options?.deviceId
-          ? {
-              video: {
-                ...CAMERA_CONSTRAINTS.video,
-                deviceId: { exact: options.deviceId }
-              },
-              audio: false
-            }
-          : CAMERA_CONSTRAINTS;
+        // Load camera settings for focus mode
+        const cameraSettings = loadCameraSettings();
+        
+        // Build constraints with optional deviceId and focusMode
+        const constraints = {
+          video: {
+            ...CAMERA_CONSTRAINTS.video,
+            ...(options?.deviceId && { deviceId: { exact: options.deviceId } }),
+            focusMode: options?.focusMode || cameraSettings.focusMode,
+          },
+          audio: false
+        };
         
         console.log('Camera constraints:', constraints);
 

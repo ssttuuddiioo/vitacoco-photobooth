@@ -1,5 +1,7 @@
 // Camera settings management with localStorage persistence
 
+export type FocusMode = 'manual' | 'continuous' | 'single-shot';
+
 export interface CameraSettings {
   zoom: number;
   brightness: number;
@@ -9,6 +11,7 @@ export interface CameraSettings {
   cropY: number;
   rotation: number;
   deviceId?: string; // Optional: specific camera device to use
+  focusMode: FocusMode; // Autofocus mode
 }
 
 const DEFAULT_SETTINGS: CameraSettings = {
@@ -20,6 +23,7 @@ const DEFAULT_SETTINGS: CameraSettings = {
   cropY: 0,
   rotation: 0,
   deviceId: undefined, // Use system default camera
+  focusMode: 'manual', // Disable autofocus by default
 };
 
 const STORAGE_KEY = 'photobooth-camera-settings';
