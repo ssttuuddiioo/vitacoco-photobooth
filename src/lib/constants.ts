@@ -10,7 +10,7 @@ export const CONSTANTS = {
   PHOTO_WIDTH: 346, // Photo width
   PHOTO_HEIGHT: 317, // Photo height
   FLASH_DURATION_MS: 200, // Optimized for snappy response without lag
-  THANK_YOU_DURATION_MS: 15000, // 15 seconds
+  THANK_YOU_DURATION_MS: 5000, // 5 seconds
 } as const;
 
 export const CAMERA_CONSTRAINTS = {
