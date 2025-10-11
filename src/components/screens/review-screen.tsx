@@ -77,26 +77,26 @@ export const ReviewScreen = ({
       <div className="absolute inset-y-16 flex items-center" style={{ left: 'calc(50% + 200px + 50px)' }}>
         <div className="flex flex-col animate-slide-in-right items-start" style={{ gap: '30px', animationDelay: '0.3s', paddingBottom: '80px' }}>
           <button
-            onClick={handlePrint}
-            disabled={isPrinting}
-            className="px-10 py-5 text-7xl font-bold text-white rounded-xl shadow-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ 
-              backgroundColor: '#388046',
-              border: '2px solid #F8F3EC'
-            }}
-          >
-            {isPrinting ? 'Printing...' : 'Print Strips'}
-          </button>
-
-          <button
             onClick={handleRedo}
-            className="px-4 py-3 text-2xl font-bold text-white rounded-lg shadow-xl transition-all hover:scale-105 active:scale-95"
+            className="px-8 py-4 text-4xl font-bold text-white rounded-lg shadow-xl transition-all hover:scale-105 active:scale-95"
             style={{ 
               backgroundColor: '#388046',
               border: '2px solid #F8F3EC'
             }}
           >
             Redo
+          </button>
+
+          <button
+            onClick={handlePrint}
+            disabled={isPrinting}
+            className="px-20 py-10 text-9xl font-bold text-white rounded-2xl shadow-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ 
+              backgroundColor: '#388046',
+              border: '4px solid #F8F3EC'
+            }}
+          >
+            {isPrinting ? 'Printing...' : 'Print Strips'}
           </button>
 
           {printError && (

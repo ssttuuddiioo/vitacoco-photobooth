@@ -33,6 +33,9 @@
     
     /* Prevent pull-to-refresh */
     touch-action: pan-x pan-y;
+    
+    /* Hide cursor for touchscreen kiosk mode */
+    cursor: none;
   }
 
   #root {
