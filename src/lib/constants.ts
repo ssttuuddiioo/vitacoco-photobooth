@@ -18,6 +18,7 @@ export const CAMERA_CONSTRAINTS = {
     width: { ideal: 1280 },
     height: { ideal: 720 },
     facingMode: 'user',
+    focusMode: 'manual', // Disable autofocus
   },
   audio: false,
 } as const;
